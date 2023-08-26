@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/pelanggan/app.dart';
 import 'package:jukirparkirta/jukir/app.dart';
 
 class LoginPage extends StatefulWidget {
@@ -49,11 +48,7 @@ class _LoginPageState extends State<LoginPage> {
               prefs.setString('token', token);
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyAppJukir()));
             } else {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setBool('isLoggedIn', true);
-              prefs.setString('userRole', 'pelanggan');
-              prefs.setString('token', token);
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyApp()));
+
             }
           } else {
           // Gagal login, tampilkan pesan kesalahan

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/pelanggan/app.dart';
+import 'package:jukirparkirta/jukir/app.dart';
 
 class SubmittedPage extends StatefulWidget {
   @override
@@ -70,7 +70,7 @@ class _SubmittedPageState extends State<SubmittedPage> {
                       Navigator.of(context).pop();
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MyApp()),
+                        MaterialPageRoute(builder: (context) => MyAppJukir()),
                       );
                     },
                     style: ButtonStyle(
