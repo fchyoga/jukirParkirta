@@ -12,6 +12,7 @@ dependencies:
   google_maps_flutter: ^2.2.0
   http: ^0.13.3
   shared_preferences: ^2.0.8
+  sp_util: ^2.0.0
   cupertino_icons: ^1.0.0
   geolocator: ^8.0.1
   permission_handler: any
@@ -20,6 +21,10 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   location: any
   image_picker: ^0.8.8
+  bloc: ^8.0.3
+  flutter_bloc: ^8.0.1
+  shimmer: ^2.0.0
+  top_snackbar_flutter: ^1.0.0
 
 
 dev_dependencies:

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/jukir/kendaraan.dart';
-import 'package:jukirparkirta/jukir/home.dart';
-import 'package:jukirparkirta/jukir/rumah.dart';
+import 'package:jukirparkirta/ui/jukir/kendaraan.dart';
+import 'package:jukirparkirta/ui/jukir/home.dart';
+import 'package:jukirparkirta/ui/jukir/rumah.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';

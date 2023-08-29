@@ -6,7 +6,7 @@ import 'package:jukirparkirta/color.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jukirparkirta/jukir/submitted.dart';
+import 'package:jukirparkirta/ui/jukir/submitted.dart';
 
 import 'dart:async';
 

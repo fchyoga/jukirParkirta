@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:jukirparkirta/auth/auth.dart';
+import 'package:jukirparkirta/ui/auth/pre_login_page.dart';
 import 'package:jukirparkirta/color.dart';
 
 class SplashPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class _SplashPageState extends State<SplashPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const AuthPage(),
+          builder: (context) => const PreLoginPage(),
         ),
       );
     });

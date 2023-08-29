@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/auth/login.dart';
+import 'package:jukirparkirta/ui/auth/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

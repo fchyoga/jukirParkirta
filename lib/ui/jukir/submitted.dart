@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/jukir/app.dart';
+import 'package:jukirparkirta/ui/jukir/app.dart';
 
 class SubmittedPage extends StatefulWidget {
   @override
