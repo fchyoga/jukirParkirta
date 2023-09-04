@@ -11,5 +11,5 @@
    const  MANAGEMENT_ID = "MANAGEMENT_ID";
    const  MANAGEMENT = "MANAGEMENT";
    const  IS_LOGGED_IN = "isLoggedIn";
-   const  API_TOKEN = "API_TOKEN";
+   const  API_TOKEN = "token";
 

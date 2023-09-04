@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jukirparkirta/bloc/auth_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/auth/login_page.dart';
 import 'package:jukirparkirta/ui/auth/register_page.dart';
@@ -54,10 +56,12 @@ class _PreLoginPageState extends State<PreLoginPage> {
                 children: [
                   TextButton(
                       onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
+                        context.read<AuthenticationBloc>().unAuthenticatedEvent();
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          "/",
+                              (route) => false,
+                        );
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Red500),

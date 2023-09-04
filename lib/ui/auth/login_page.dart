@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:jukirparkirta/bloc/auth_bloc.dart';
+import 'package:jukirparkirta/bloc/login_bloc.dart';
 import 'package:jukirparkirta/ui/jukir/app.dart';
+import 'package:jukirparkirta/widget/loading_dialog.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -14,6 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  final _loadingDialog = LoadingDialog();
+  late BuildContext _context;
 
   Future<void> _login(String role, String password) async {
     // Buat URL sesuai dengan jenis login (pelanggan atau jukir)
@@ -115,7 +123,32 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocProvider(
+        create: (context) => LoginBloc(),
+        child: BlocListener<LoginBloc, LoginState>(
+            listener: (context, state) {
+              if (state is LoginLoadingState) {
+                state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
+              } else if (state is LoginSuccessState) {
+                _context.read<AuthenticationBloc>().authenticatedEvent();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  "/",
+                      (route) => false,
+                );
+              } else if (state is LoginErrorState) {
+                showTopSnackBar(
+                  context,
+                  CustomSnackBar.error(
+                    message: state.error,
+                  ),
+                );
+              }
+            },
+            child: BlocBuilder<LoginBloc, LoginState>(
+                builder: (context, state) {
+                  _context = context;
+                  return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(30),
@@ -223,7 +256,8 @@ class _LoginPageState extends State<LoginPage> {
                               String email = _emailController.text;
                               String password = _passwordController.text;
                               if (email.isNotEmpty && password.isNotEmpty) {
-                                _login('jukir', password);
+                                // _login('jukir', password);
+                                context.read<LoginBloc>().doLogin(email, password);
                               } else {
                                 showDialog(
                                   context: context,
@@ -268,6 +302,10 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+                }
+                )
+        )
     );
   }
 }
