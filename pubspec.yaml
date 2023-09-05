@@ -25,6 +25,8 @@ dependencies:
   flutter_bloc: ^8.0.1
   shimmer: ^2.0.0
   top_snackbar_flutter: ^1.0.0
+  flutter_local_notifications: ^9.9.1
+  firebase_messaging: ^14.1.0
 
 
 dev_dependencies:
