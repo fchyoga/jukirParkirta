@@ -1,4 +1,4 @@
-package com.example.jukirparkirta
+package com.bellsaya.parkirta.jukir
 
 import io.flutter.embedding.android.FlutterActivity
 
