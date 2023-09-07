@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/jukir/profile.dart';
+import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:jukirparkirta/jukir/kendaraan.dart'; // Import Kendaraan class from list_kendaraan_page_jukir.dart
+import 'package:jukirparkirta/ui/jukir/kendaraan.dart'; // Import Kendaraan class from list_kendaraan_page_jukir.dart
 
 class DetailParkirPage extends StatelessWidget {
   final dynamic kendaraan;

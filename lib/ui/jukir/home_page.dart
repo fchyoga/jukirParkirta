@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/jukir/profile.dart';
-import 'package:jukirparkirta/jukir/api.dart';
+import 'package:jukirparkirta/ui/jukir/profile.dart';
+import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -42,16 +42,13 @@ class _HomePageJukirState extends State<HomePageJukir> {
   LatLng _myLocation = LatLng(0, 0);
   Set<Marker> _myLocationMarker = {};
   late GoogleMapController _mapsController;
-  List<dynamic>? _parkingLocations;
+  List<dynamic> _parkingLocations = [];
   List<dynamic>? _parkingUser;
   Set<Polyline> _polylines = {};
 
   @override
   void initState() {
     super.initState();
-    _loadParkIcon();
-    _fetchParkingLocations();
-    _getUserLocation();
     fetchData();
   }
 
@@ -164,6 +161,10 @@ class _HomePageJukirState extends State<HomePageJukir> {
 
   void _onMapCreated(GoogleMapController controller) {
     _mapsController = controller;
+
+    _loadParkIcon();
+    _fetchParkingLocations();
+    _getUserLocation();
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       setState(() {
@@ -483,6 +484,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Gray100,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Red500,
         toolbarHeight: 84,
@@ -492,13 +494,13 @@ class _HomePageJukirState extends State<HomePageJukir> {
         title: Row(
           children: [
             Padding(
-              padding: EdgeInsets.only(left: 24),
+              padding: const EdgeInsets.only(left: 24),
               child: Image.asset(
                 'assets/images/logo-parkirta2.png',
                 height: 40,
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
           ],
         ),
         actions: [
@@ -541,7 +543,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 ))).union(_myLocationMarker)
               : <Marker>{},
             polylines: _polylines ?? {},
-            polygons: Set<Polygon>.from(_parkingLocations!.map((location) {
+            polygons: Set<Polygon>.from(_parkingLocations.map((location) {
               List<String> areaLatLongStrings = location['area_latlong'].split('},{');
               List<LatLng> polygonCoordinates = areaLatLongStrings.map<LatLng>((areaLatLongString) {
                 String latLngString = areaLatLongString.replaceAll('{', '').replaceAll('}', '');
