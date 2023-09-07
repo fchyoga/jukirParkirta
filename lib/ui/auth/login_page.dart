@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:jukirparkirta/bloc/auth_bloc.dart';
 import 'package:jukirparkirta/bloc/login_bloc.dart';
-import 'package:jukirparkirta/ui/jukir/app.dart';
-import 'package:jukirparkirta/widget/loading_dialog.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/widget/loading_dialog.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -23,103 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   final _loadingDialog = LoadingDialog();
   late BuildContext _context;
 
-  Future<void> _login(String role, String password) async {
-    // Buat URL sesuai dengan jenis login (pelanggan atau jukir)
-    String url = role == 'jukir' ? 'https://parkirta.com/api/login/jukir' : 'https://parkirta.com/api/login/pelanggan';
-
-    // Persiapkan data untuk dikirim
-    Map<String, String> data = {
-      'email': _emailController.text,
-      'password': password,
-    };
-
-    // Kirim permintaan HTTP POST
-    try {
-      final response = await http.post(Uri.parse(url), body: data);
-
-      // Periksa kode status respons
-      if (response.statusCode == 200) {
-        // Berhasil login, ambil data dari respons JSON
-        Map<String, dynamic> responseData = json.decode(response.body);
-        bool success = responseData['success'];
-        String token = responseData['data']['token'];
-        // String fullName = responseData['data']['nama_lengkap'];
-        String userRole = responseData['data']['role'];
-        // String status = responseData['data']['status'];
-
-          if (success) {
-            // Berhasil login, arahkan ke halaman yang sesuai (MyApp atau MyAppJukir)
-            if (userRole == 'jukir') {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setBool('isLoggedIn', true);
-              prefs.setString('userRole', 'jukir');
-              prefs.setString('token', token);
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyAppJukir()));
-            } else {
-
-            }
-          } else {
-          // Gagal login, tampilkan pesan kesalahan
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Login Failed'),
-                content: const Text('Invalid email or password.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      } else {
-        // Gagal login, tampilkan pesan kesalahan
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Login Failed'),
-              content: const Text('Invalid email or password.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      // Terjadi kesalahan saat melakukan permintaan HTTP
-      print('Error: $e');
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('An error occurred while logging in. Please try again.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 128),
             Image.asset(
               'assets/images/logo-parkirta.png',
               width: 54,
@@ -299,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ],
-        ),,
+        ),
       ),
     );
                 }

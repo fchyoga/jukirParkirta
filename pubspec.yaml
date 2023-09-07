@@ -45,3 +45,8 @@ flutter:
     - assets/images/yourloc.png
     - assets/images/mail.png
     - assets/images/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/font/Inter-Regular.ttf

@@ -4,9 +4,9 @@ import 'package:jukirparkirta/ui/auth/login_page.dart';
 import 'package:jukirparkirta/ui/auth/pre_login_page.dart';
 import 'package:jukirparkirta/ui/auth/register_page.dart';
 import 'package:jukirparkirta/ui/auth/splash_page.dart';
-import 'package:jukirparkirta/ui/jukir/app.dart';
+import 'package:jukirparkirta/ui/jukir/main_page.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/ui/jukir/home.dart';
+import 'package:jukirparkirta/ui/jukir/home_page.dart';
 import 'package:jukirparkirta/utils/contsant/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,17 +58,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget home;
-    if (isLoggedIn) {
-      home = MyAppJukir();
-    } else {
-      home = const SplashPage();
-    }
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Parkirta',
       theme: ThemeData(
+        fontFamily: 'Inter',
         primaryColor: Red50,
       ),
         initialRoute: "/",
@@ -93,7 +88,7 @@ class AppRoute extends StatelessWidget {
         debugPrint("state change $state");
         switch (state) {
           case Authentication.Authenticated:
-            return HomePageJukir();
+            return MainPage();
           case Authentication.Unauthenticated:
             return LoginPage();
           default:
