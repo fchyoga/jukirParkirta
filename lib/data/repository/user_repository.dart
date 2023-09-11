@@ -6,11 +6,12 @@ import 'package:jukirparkirta/data/endpoint.dart';
 import 'package:jukirparkirta/data/message/response/login_response.dart';
 
 class UserRepository {
-  Future<LoginResponse> login(String email, String password) async {
+  Future<LoginResponse> login(String email, String password, String token) async {
     try {
       Map<String, String> data = {
         'email': email,
         'password': password,
+        'device_token': token,
       };
       var response = await http.post(Uri.parse(Endpoint.urlLogin), body: data);
           // await http.post("login", data: loginRequest.toJson());
