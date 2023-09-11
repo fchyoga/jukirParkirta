@@ -47,6 +47,13 @@ class _HomePageJukirState extends State<HomePageJukir> {
   Set<Polyline> _polylines = {};
 
   @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     fetchData();

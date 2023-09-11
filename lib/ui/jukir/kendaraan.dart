@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/ui/jukir/detail_parkir.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'detail_parking_page.dart';
 
 class ListKendaraanPageJukir extends StatefulWidget {
   @override
@@ -214,11 +215,10 @@ class _ListKendaraanPageJukirState extends State<ListKendaraanPageJukir> {
                     ],
                   ),
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushNamed(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailParkirPage(kendaraan: kendaraan),
-                      ),
+                      "/detail_parking",
+                      arguments: kendaraan['id'],
                     );
                   },
                 ),

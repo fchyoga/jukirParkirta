@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/jukir/kendaraan.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
 import 'package:jukirparkirta/ui/jukir/rumah.dart';
@@ -63,6 +64,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: NavigationService.navigatorKey,
       backgroundColor: Gray100,
       body: IndexedStack(
         index: _currentIndex,
