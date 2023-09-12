@@ -12,10 +12,13 @@ import 'package:jukirparkirta/ui/jukir/detail_parking_page.dart';
 import 'package:jukirparkirta/ui/jukir/main_page.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
+import 'package:jukirparkirta/ui/jukir/payment_page.dart';
 import 'package:jukirparkirta/utils/contsant/authentication.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sp_util/sp_util.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,7 +82,17 @@ class MainApp extends StatefulWidget {
   FirebaseMessaging.onMessage.listen((RemoteMessage message){
   print("masuk di dalam");
 
-  Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
+  String? topicKey = message.data["topic_key"];
+  if(topicKey == "parking_arrive"){
+    showTopSnackBar(
+      NavigationService.navigatorKey.currentContext!,
+      CustomSnackBar.info(
+        message: "message id ${message.data["id"]}",
+      ),
+    );
+  }else if(topicKey == "payment_entry"){
+    Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
+  }
 
   });
   super.initState();
@@ -103,6 +116,7 @@ class MainApp extends StatefulWidget {
           '/pre_login': (context) => const PreLoginPage(),
           '/home': (context) => HomePageJukir(),
           '/detail_parking': (context) => DetailParkingPage(),
+          '/payment': (context) => PaymentPage(),
         }
     );
   }

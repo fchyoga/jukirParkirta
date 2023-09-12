@@ -27,6 +27,7 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
   @override
   Widget build(BuildContext context) {
     retributionId = ModalRoute.of(context)?.settings.arguments as int;
+    debugPrint("retribusi id ${retributionId}");
     return BlocProvider(
         create: (context) => DetailParkingBloc()..checkDetailParking(retributionId.toString()),
         child: BlocListener<DetailParkingBloc, DetailParkingState>(
@@ -48,6 +49,7 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
             },
             child: BlocBuilder<DetailParkingBloc, DetailParkingState>(
                 builder: (context, state) {
+                  var provider = context.read<DetailParkingBloc>();
                   return Scaffold(
                     backgroundColor: Colors.white,
       appBar: AppBar(
@@ -135,7 +137,7 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("Waktu Parkir", style: TextStyle(color: AppColors.textPassive, fontSize: 16),),
-                                    Text(retribution?.lamaParkir ?? "01:00", style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 24),),],
+                                    Text("${retribution?.lamaParkir ?? "0"} jam", style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold, fontSize: 24),),],
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -147,10 +149,13 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
                             ),
                           ),
 
-                    Padding(
+                    retribution?.statusParkir == "Proses Pembayaran"? Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
-                      child:ButtonDefault(title: "Terima Pembayaran", color: AppColors.green, onTap: (){})
-                    )
+                      child:ButtonDefault(title: "Terima Pembayaran", color: AppColors.green, onTap: () async{
+                        await Navigator.pushNamed(context, "/payment", arguments: retribution);
+                        provider.checkDetailParking(retributionId.toString());
+                      })
+                    ): Container()
 
                         ],
                       ),

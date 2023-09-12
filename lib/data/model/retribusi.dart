@@ -20,7 +20,7 @@ class Retribusi {
 
     dynamic jenisKendaraan;
     String? nopol;
-    dynamic lamaParkir;
+    String? lamaParkir;
     int? subtotalBiaya;
     dynamic isPayNow;
     String statusParkir;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/main.dart';
-import 'package:jukirparkirta/ui/jukir/kendaraan.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
+import 'package:jukirparkirta/ui/jukir/parking_page.dart';
 import 'package:jukirparkirta/ui/jukir/rumah.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +25,7 @@ class _MainPageState extends State<MainPage> {
   Map<String, dynamic> userData = {};
   late List<Widget> _pages = [
     RumahPageJukir(),
-    ListKendaraanPageJukir(),
+    ParkingPage(),
   ];
 
   @override
@@ -52,7 +52,7 @@ class _MainPageState extends State<MainPage> {
             HomePageJukir()
           else
             RumahPageJukir(),
-          ListKendaraanPageJukir(),
+          ParkingPage(),
         ];
       });
     } else {
