@@ -149,7 +149,7 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
                             ),
                           ),
 
-                    retribution?.statusParkir == "Proses Pembayaran"? Padding(
+                    retribution?.statusParkir == "Proses Pembayaran" && retribution?.pembayaran?.status!= "SUDAH DIBAYAR"? Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
                       child:ButtonDefault(title: "Terima Pembayaran", color: AppColors.green, onTap: () async{
                         await Navigator.pushNamed(context, "/payment", arguments: retribution);
