@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
-import 'package:jukirparkirta/ui/jukir/kendaraan.dart';
+import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
+import 'package:jukirparkirta/ui/jukir/parking_page.dart';
 import 'package:jukirparkirta/ui/jukir/rumah.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +25,7 @@ class _MainPageState extends State<MainPage> {
   Map<String, dynamic> userData = {};
   late List<Widget> _pages = [
     RumahPageJukir(),
-    ListKendaraanPageJukir(),
+    ParkingPage(),
   ];
 
   @override
@@ -51,7 +52,7 @@ class _MainPageState extends State<MainPage> {
             HomePageJukir()
           else
             RumahPageJukir(),
-          ListKendaraanPageJukir(),
+          ParkingPage(),
         ];
       });
     } else {
@@ -63,6 +64,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: NavigationService.navigatorKey,
       backgroundColor: Gray100,
       body: IndexedStack(
         index: _currentIndex,
@@ -114,18 +116,48 @@ class _MainPageState extends State<MainPage> {
         )])
       ),
       floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-              onPressed: (){
+          ?Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+              bottom: 1,
+              child: Container(
+                width: 55,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: AppColors.colorPrimary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.colorPrimary.withOpacity(0.25),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),)
+          ),
+          Container(
+            width: 65,
+            height: 65,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color: AppColors.colorPrimary,
+
+            ),
+            child: InkWell(
+              onTap: () {
                 Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-              );
-            },
-            backgroundColor: Red500,
-        shape: const CircleBorder(),
-        child: SvgPicture.asset("assets/images/ic_discovery.svg"),
+                  context,
+                  MaterialPageRoute(builder: (context) => MainPage()),
+                );
+              },
+              child: SvgPicture.asset("assets/images/ic_discovery.svg"),
+            ) ,
           )
-          : null,
+        ],
+      ): null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

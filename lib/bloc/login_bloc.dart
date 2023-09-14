@@ -11,10 +11,10 @@ class LoginBloc extends Cubit<LoginState> {
 
 
 
-  void doLogin(String email, String password) async {
+  void doLogin(String email, String password, String token) async {
     emit(LoginLoadingState(true));
     final response =
-        await _userRepository.login(email, password);
+        await _userRepository.login(email, password, token);
     emit(LoginLoadingState(false));
     if (response.success) {
 
