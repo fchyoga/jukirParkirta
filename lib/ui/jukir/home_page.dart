@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:jukirparkirta/ui/jukir/api.dart';
@@ -220,6 +221,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
                   Text('ID Pelanggan: ${data['id_pelanggan']}'),
                   Text('Jenis Kendaraan: ${data['jenis_kendaraan']}'),
                   Text('Nomor Polisi: ${data['nopol']}'),
+                  Text('Waktu Parkir: ${DateFormat("dd MMM yy HH:mm").format(DateTime.parse(data['created_at']))}'),
                   // Tambahkan informasi lain yang ingin ditampilkan
                 ],
               ),
@@ -524,8 +526,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 );
               },
               child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/profile.png'),
                 radius: 20,
+                child: Image.asset('assets/images/profile.png'),
               ),
             ),
           ),

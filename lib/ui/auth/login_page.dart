@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance; // Change here
     _firebaseMessaging.getToken().then((token) {
       deviceToken = token ?? "";
+      debugPrint("device token $token");
     });
 
     super.initState();
