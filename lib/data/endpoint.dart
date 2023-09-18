@@ -9,5 +9,6 @@ class Endpoint {
   static const String urlLogin= '${_baseUrl}login/jukir';
   static const String urlArrival= '${_baseUrl}retribusi/parking/arrive';
   static const String urlCheckDetailParking= '${_baseUrl}retribusi/parking/check/detail';
+  static const String urlUploadPhotoVehicle= '${_baseUrl}retribusi/upload/foto_kendaraan';
   static const String urlPayment= '${_baseUrl}retribusi/payment/jukir';
 }

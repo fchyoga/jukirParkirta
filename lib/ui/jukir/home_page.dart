@@ -1,18 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:jukirparkirta/utils/contsant/app_colors.dart';
+import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
+
+import 'package:sp_util/sp_util.dart';
 // import 'package:http_parser/http_parser.dart';
 
 class HomePageJukir extends StatefulWidget {
@@ -41,7 +46,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   loc.Location _location = loc.Location();
   LatLng _myLocation = LatLng(0, 0);
   Set<Marker> _myLocationMarker = {};
-  late GoogleMapController _mapsController;
+  GoogleMapController? _mapsController;
   List<dynamic> _parkingLocations = [];
   List<dynamic>? _parkingUser;
   Set<Polyline> _polylines = {};
@@ -55,13 +60,16 @@ class _HomePageJukirState extends State<HomePageJukir> {
 
   @override
   void initState() {
-    super.initState();
     fetchData();
+    _loadParkIcon();
+    _fetchParkingLocations();
+    _getUserLocation();
+    super.initState();
   }
 
   @override
   void dispose() {
-    _mapsController.dispose();
+    _mapsController?.dispose();
     super.dispose();
   }
 
@@ -144,7 +152,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
       });
     });
 
-    _mapsController.animateCamera(CameraUpdate.newLatLng(_myLocation));
+    _mapsController?.animateCamera(CameraUpdate.newLatLng(_myLocation));
   }
 
   void _startLocationUpdates() {
@@ -169,9 +177,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   void _onMapCreated(GoogleMapController controller) {
     _mapsController = controller;
 
-    _loadParkIcon();
-    _fetchParkingLocations();
-    _getUserLocation();
+
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       setState(() {
@@ -216,6 +222,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
                   Text('ID Pelanggan: ${data['id_pelanggan']}'),
                   Text('Jenis Kendaraan: ${data['jenis_kendaraan']}'),
                   Text('Nomor Polisi: ${data['nopol']}'),
+                  Text('Waktu Parkir: ${DateFormat("dd MMM yy HH:mm").format(DateTime.parse(data['created_at']))}'),
                   // Tambahkan informasi lain yang ingin ditampilkan
                 ],
               ),
@@ -375,9 +382,9 @@ class _HomePageJukirState extends State<HomePageJukir> {
       final userId = await getUserId();
       final locationId = await getLocationParkingId(userId);
       final data = await getParkingData(locationId);
-
+      debugPrint("get parking ${data.length} $data");
+      _parkingUser = data;
       setState(() {
-        _parkingUser = data;
       });
     } catch (error) {
       print('Error: $error');
@@ -435,8 +442,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   }
 
   Future<List<Map<String, dynamic>>> getParkingData(int locationId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = SpUtil.getString(API_TOKEN);
 
     final response = await http.post(
       Uri.parse('https://parkirta.com/api/retribusi/parking/check'),
@@ -452,7 +458,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final parkings = data['data'];
-      print('$parkings');
+      print('parking $parkings');
       return List<Map<String, dynamic>>.from(parkings);
     } else {
       throw Exception('Failed to fetch parking data');
@@ -521,8 +527,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 );
               },
               child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/profile.png'),
                 radius: 20,
+                child: Image.asset('assets/images/profile.png'),
               ),
             ),
           ),
@@ -536,6 +542,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
               target: LatLng(-5.143648100120257, 119.48282708990482), // Ganti dengan posisi awal peta
               zoom: 20.0,
             ),
+            zoomControlsEnabled: false,
             markers: _parkingUser != null
               ? Set<Marker>.from(_parkingUser!.map((location) => Marker(
                   markerId: MarkerId(location['id'].toString()),
@@ -570,6 +577,43 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 strokeWidth: 2,
               );
             })),
+          ),
+          Positioned(
+              top: 136.0,
+              right: 16.0,
+              child: InkWell(
+                child: Container(
+                  alignment: Alignment.center,
+                  padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.01),
+                        blurRadius: 5,
+                        offset: const Offset(0, 12),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 7),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.09),
+                        blurRadius: 3,
+                        offset: const Offset(0, 3),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),),
+                    ],
+
+                  ),
+                  child: const Icon(Icons.my_location_outlined, color: AppColors.textPassive,),
+                ),
+                onTap: () {
+                  _mapsController?.animateCamera(CameraUpdate.newLatLng(_myLocation));
+                },
+              )
           ),
           Positioned(
             bottom: 64,
