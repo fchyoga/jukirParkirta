@@ -85,15 +85,9 @@ class MainApp extends StatefulWidget {
 
   String? topicKey = message.data["topic_key"];
   if(topicKey == "parking_arrive"){
-    showTopSnackBar(
-      NavigationService.navigatorKey.currentContext!,
-      CustomSnackBar.info(
-        message: "message id ${message.data["id"]}",
-      ),
-    );
+    showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, entryDate: DateTime.now(), memberId: "memberId", vehicleType: "vehicleType", policeNumber: "policeNumber", onSuccess: (){}));
   }else if(topicKey == "payment_entry"){
-    // Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
-    showDialog(context: context, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, entryDate: DateTime.now(), memberId: "memberId", vehicleType: "vehicleType", policeNumber: "policeNumber", onSuccess: (){}));
+    Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
   }
 
   });
@@ -101,9 +95,9 @@ class MainApp extends StatefulWidget {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print('A new onMessageOpenedApp event was published! ');
     print('remote message ${message.data} ');
-    if(message.data["topic_key"] == "payment_entry" && NavigationService.navigatorKey.currentContext!=null) {
-
-    } else if(message.data["topic_key"] == "payment_entry" && NavigationService.navigatorKey.currentContext!=null){
+    if(message.data["topic_key"]  == "parking_arrive" && NavigationService.navigatorKey.currentContext!=null){
+      showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, entryDate: DateTime.now(), memberId: "memberId", vehicleType: "vehicleType", policeNumber: "policeNumber", onSuccess: (){}));
+    }else if(message.data["topic_key"] == "payment_entry" && NavigationService.navigatorKey.currentContext!=null){
     //   Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/arrive', arguments: int.tryParse(message.data["id"]));
     // }else if(message.data["topic_key"] == PAYMENT_COMPLETE && NavigationService.navigatorKey.currentContext!=null){
       Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));

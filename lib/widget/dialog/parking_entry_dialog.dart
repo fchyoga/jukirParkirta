@@ -48,7 +48,6 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    _context = context;
     return BlocProvider(
         create: (context) => DetailParkingBloc()..checkDetailParking(widget.id.toString()),
         child: BlocListener<DetailParkingBloc, DetailParkingState>(
@@ -59,6 +58,9 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
                 setState(() {
                   retribution = state.data.retribusi;
                 });
+              } else if (state is UploadVehiclePhotoSuccessState) {
+                Navigator.of(context).pop(); // Tutup dialog
+                widget.onSuccess();
               } else if (state is ErrorState) {
                 showTopSnackBar(
                   context,
@@ -70,6 +72,7 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
             },
             child: BlocBuilder<DetailParkingBloc, DetailParkingState>(
                 builder: (context, state) {
+                  _context = context;
                   var provider = context.read<DetailParkingBloc>();
                   return AlertDialog(
                     title: Text('Parkir Arrive'),
@@ -86,17 +89,13 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
                     ),
                     actions: [
                       ElevatedButton.icon(
-                        onPressed: () async {
-                          setState(() {
-                            _isLoading = true; // Tampilkan indikator loading
-                          });
-                          await _takeVehiclePhoto(widget.id); // Mengambil foto kendaraan
-                          setState(() {
-                            _isLoading = false; // Sembunyikan indikator loading setelah foto diunggah
-                          });
+                        onPressed: state is LoadingState ? (){}: () async {
+                          var path = await _takeVehiclePhoto(widget.id); // Mengambil foto kendaraan
+                          debugPrint("path $path");
+                          if(path !=null ) provider.uploadVehiclePhoto(widget.id.toString(), path);
                         },
-                        icon: _isLoading ? CircularProgressIndicator() : Icon(Icons.camera),
-                        label: Text(_isLoading ? 'Loading...' : 'Foto Kendaraan'),
+                        icon: state is LoadingState  ? const Padding(padding: EdgeInsets.all(5), child: CircularProgressIndicator(),) : Icon(Icons.camera),
+                        label: Text(state is LoadingState  ? 'Loading...' : 'Foto Kendaraan'),
                       ),
                       TextButton(
                         onPressed: () {
@@ -114,69 +113,11 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
   }
 
 
-  Future<void> _takeVehiclePhoto(int parkingId) async {
+  Future<String?> _takeVehiclePhoto(int parkingId) async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
     final token = SpUtil.getString(API_TOKEN);
-    if (pickedFile == null) return;
-    setState(() {
-      _isLoading = true;
-    });
-    var _vehicleImage = File(pickedFile.path);
-
-    // Membuat request multipart
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://parkirta.com/api/retribusi/upload/foto_kendaraan'),
-    );
-
-    // Menambahkan header bearer token
-    request.headers['Authorization'] = 'Bearer $token';
-
-    // Menambahkan field 'parking_id' ke request
-    request.fields['id_retribusi_parkir'] = parkingId.toString();
-
-    // Menambahkan file gambar ke request
-    request.files.add(await http.MultipartFile.fromPath(
-      'foto_kendaraan',
-      _vehicleImage.path,
-    ));
-
-    try {
-      // Mengirim request ke API
-      final response = await request.send();
-
-      // Membaca responsenya
-      final responseString = await response.stream.bytesToString();
-      final responseData = json.decode(responseString);
-
-      // Menangani responsenya
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseString);
-        // Menampilkan popup berhasil
-        setState(() {
-          _isLoading = false; // Sembunyikan indikator loading
-        });
-        Navigator.of(context).pop(); // Tutup dialog
-        widget.onSuccess();
-        // Tampilkan popup sukses setelah mengunggah foto
-      } else {
-        // Menampilkan popup gagal
-        showTopSnackBar(
-          _context,
-          CustomSnackBar.error(
-            message: 'Gagal mengunggah foto kendaraan',
-          ),
-        );
-      }
-    } catch (error) {
-      // Menampilkan popup gagal
-      showTopSnackBar(
-        _context,
-        CustomSnackBar.error(
-          message: 'Terjadi kesalahan saat mengunggah foto kendaraan',
-        ),
-      );
-    }
+    if (pickedFile == null) return null;
+    return pickedFile.path;
   }
 
 }

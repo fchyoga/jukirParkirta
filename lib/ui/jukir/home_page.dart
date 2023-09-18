@@ -8,6 +8,7 @@ import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:jukirparkirta/utils/contsant/app_colors.dart';
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location/location.dart' as loc;
@@ -541,6 +542,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
               target: LatLng(-5.143648100120257, 119.48282708990482), // Ganti dengan posisi awal peta
               zoom: 20.0,
             ),
+            zoomControlsEnabled: false,
             markers: _parkingUser != null
               ? Set<Marker>.from(_parkingUser!.map((location) => Marker(
                   markerId: MarkerId(location['id'].toString()),
@@ -575,6 +577,43 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 strokeWidth: 2,
               );
             })),
+          ),
+          Positioned(
+              top: 136.0,
+              right: 16.0,
+              child: InkWell(
+                child: Container(
+                  alignment: Alignment.center,
+                  padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.01),
+                        blurRadius: 5,
+                        offset: const Offset(0, 12),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 7),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.09),
+                        blurRadius: 3,
+                        offset: const Offset(0, 3),),
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),),
+                    ],
+
+                  ),
+                  child: const Icon(Icons.my_location_outlined, color: AppColors.textPassive,),
+                ),
+                onTap: () {
+                  _mapsController?.animateCamera(CameraUpdate.newLatLng(_myLocation));
+                },
+              )
           ),
           Positioned(
             bottom: 64,
