@@ -35,7 +35,7 @@ class _PreLoginPageState extends State<PreLoginPage> {
             ),
             const SizedBox(height: 40),
             Text(
-              'Selamat datang di Parkirta!',
+              'Selamat datang di Aplikasi Jukir Parkirta!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
