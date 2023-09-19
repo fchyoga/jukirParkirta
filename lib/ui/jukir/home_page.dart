@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/data/message/response/parking/parking_location_response.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:jukirparkirta/utils/contsant/app_colors.dart';
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
+import 'package:jukirparkirta/widget/loading_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart' as perm;
@@ -18,6 +22,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 
 import 'package:sp_util/sp_util.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 // import 'package:http_parser/http_parser.dart';
 
 class HomePageJukir extends StatefulWidget {
@@ -29,6 +35,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   List<Map<String, dynamic>> parkingData = [];
   String _selectedStatus = 'Penuh';
   List<String> _statusOptions = ['Penuh', 'Terisi Sebagian', 'Kosong'];
+  final _loadingDialog = LoadingDialog();
 
   
   final ImagePicker _imagePicker = ImagePicker();
@@ -47,7 +54,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   LatLng _myLocation = LatLng(0, 0);
   Set<Marker> _myLocationMarker = {};
   GoogleMapController? _mapsController;
-  List<dynamic> _parkingLocations = [];
+  List<ParkingLocation> _parkingLocations = [];
   List<dynamic>? _parkingUser;
   Set<Polyline> _polylines = {};
 
@@ -62,7 +69,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   void initState() {
     fetchData();
     _loadParkIcon();
-    _fetchParkingLocations();
+    // _fetchParkingLocations();
     _getUserLocation();
     super.initState();
   }
@@ -193,19 +200,19 @@ class _HomePageJukirState extends State<HomePageJukir> {
     });
   }
 
-  Future<void> _fetchParkingLocations() async {
-    try {
-      List<dynamic> locations = await getLocations();
-      if (mounted) {
-        setState(() {
-          _parkingLocations = locations;
-        });
-      }
-    } catch (error) {
-      // Handle error fetching parking locations
-      print('Error fetching parking locations: $error');
-    }
-  }
+  // Future<void> _fetchParkingLocations() async {
+  //   try {
+  //     List<dynamic> locations = await getLocations();
+  //     if (mounted) {
+  //       setState(() {
+  //         _parkingLocations = locations;
+  //       });
+  //     }
+  //   } catch (error) {
+  //     // Handle error fetching parking locations
+  //     print('Error fetching parking locations: $error');
+  //   }
+  // }
 
   Future<void> _showParkingArrivePopup(Map<String, dynamic> data) async {
     showDialog(
@@ -495,7 +502,29 @@ class _HomePageJukirState extends State<HomePageJukir> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocProvider(
+        create: (context) => HomeBloc()..getParkingLocation(),
+        child: BlocListener<HomeBloc, HomeState>(
+            listener: (context, state) async{
+              if (state is LoadingState) {
+                state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
+              } else if (state is SuccessGetParkingLocationState) {
+                setState(() {
+                  _parkingLocations = state.data;
+                });
+              } else if (state is ErrorState) {
+                showTopSnackBar(
+                  context,
+                  CustomSnackBar.error(
+                    message: state.error,
+                  ),
+                );
+              }
+            },
+            child: BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  // _context = context;
+                  return Scaffold(
       backgroundColor: Gray100,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -557,8 +586,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 ))).union(_myLocationMarker)
               : <Marker>{},
             polylines: _polylines ?? {},
-            polygons: Set<Polygon>.from(_parkingLocations.map((location) {
-              List<String> areaLatLongStrings = location['area_latlong'].split('},{');
+            polygons: Set<Polygon>.from(_parkingLocations.where((e) => e.areaLatlong!=null).toList().map((location) {
+              List<String> areaLatLongStrings = location.areaLatlong!.split('},{');
               List<LatLng> polygonCoordinates = areaLatLongStrings.map<LatLng>((areaLatLongString) {
                 String latLngString = areaLatLongString.replaceAll('{', '').replaceAll('}', '');
                 List<String> latLngList = latLngString.split(',');
@@ -570,7 +599,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
               }).toList();
 
               return Polygon(
-                polygonId: PolygonId(location['id'].toString()),
+                polygonId: PolygonId(location.id.toString()),
                 points: polygonCoordinates,
                 fillColor: Colors.blue.withOpacity(0.3),
                 strokeColor: Colors.blue,
@@ -684,6 +713,6 @@ class _HomePageJukirState extends State<HomePageJukir> {
           ),
         ],
       ),
-    );
+    );})));
   }
 }
