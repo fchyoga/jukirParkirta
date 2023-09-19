@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:jukirparkirta/bloc/auth_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
@@ -10,8 +12,12 @@ import 'package:jukirparkirta/ui/jukir/rumah.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:jukirparkirta/utils/contsant/app_colors.dart';
+import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sp_util/sp_util.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -26,6 +32,7 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   HomePageJukir? homePageJukir;
   Map<String, dynamic> userData = {};
+  late BuildContext _context;
   late List<Widget> _pages = [
     RumahPageJukir(),
     ParkingPage(),
@@ -40,6 +47,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    _context = context;
     return Scaffold(
       key: NavigationService.navigatorKey,
       backgroundColor: Gray100,
@@ -160,6 +168,12 @@ class _MainPageState extends State<MainPage> {
           ParkingPage(),
         ];
       });
+    } else if (response.statusCode == 403) {
+      showTopSnackBar(_context, CustomSnackBar.error(
+        message: "Sesi anda telah habis. Silakan login kembali",
+      ));
+      _context.read<AuthenticationBloc>().authenticationExpiredEvent();
+      Navigator.pushNamedAndRemoveUntil(_context, "/", (route) => false);
     } else {
       print(response.body);
       throw Exception('Failed to fetch user data');
