@@ -81,22 +81,22 @@ class MainApp extends StatefulWidget {
   void initState() {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message){
-  print("masuk di dalam");
+    print("masuk di dalam");
 
-  String? topicKey = message.data["topic_key"];
-  if(topicKey == "parking_arrive"){
-    showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, entryDate: DateTime.now(), memberId: "memberId", vehicleType: "vehicleType", policeNumber: "policeNumber", onSuccess: (){}));
-  }else if(topicKey == "payment_entry"){
-    Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
-  }
+    String? topicKey = message.data["topic_key"];
+    if(topicKey == "parking_arrive"){
+      showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, onSuccess: (){}));
+    }else if(topicKey == "payment_entry"){
+      Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/detail_parking', arguments: int.tryParse(message.data["id"]));
+    }
 
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print('A new onMessageOpenedApp event was published! ');
+    print('A new onMessageOpenedApp event was published! ${NavigationService.navigatorKey.currentContext!=null}');
     print('remote message ${message.data} ');
     if(message.data["topic_key"]  == "parking_arrive" && NavigationService.navigatorKey.currentContext!=null){
-      showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, entryDate: DateTime.now(), memberId: "memberId", vehicleType: "vehicleType", policeNumber: "policeNumber", onSuccess: (){}));
+      showDialog(context: NavigationService.navigatorKey.currentContext!, builder: (_) => ParkingEntryDialog(id:  int.tryParse(message.data["id"]) ?? 0, onSuccess: (){}));
     }else if(message.data["topic_key"] == "payment_entry" && NavigationService.navigatorKey.currentContext!=null){
     //   Navigator.pushNamed(NavigationService.navigatorKey.currentContext!,'/arrive', arguments: int.tryParse(message.data["id"]));
     // }else if(message.data["topic_key"] == PAYMENT_COMPLETE && NavigationService.navigatorKey.currentContext!=null){
@@ -167,15 +167,6 @@ late AndroidNotificationChannel channel;
 bool isFlutterLocalNotificationsInitialized = false;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: const FirebaseOptions(
-    apiKey: 'AIzaSyCRlojuTRtBCNauwVM9a7nWvoeFpt_yUkA',
-    appId: '1:498872125018:android:3dec57b31c03211a363a63',
-    messagingSenderId: '498872125018',
-    projectId: 'parkirta',
-  ));
-  await setupFlutterNotifications();
-  showFlutterNotification(message);
-
 
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
@@ -232,28 +223,5 @@ Future<void> setupFlutterNotifications() async {
   isFlutterLocalNotificationsInitialized = true;
 }
 
-void showFlutterNotification(RemoteMessage message) {
-  print("notification masuk ${message.notification?.title} ${message.notification?.body}");
-  RemoteNotification? notification = message.notification;
-  AndroidNotification? android = message.notification?.android;
-  if (notification != null && android != null) {
-    flutterLocalNotificationsPlugin.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
-            icon: '@mipmap/ic_launcher',
-          ),
-          iOS: const IOSNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true)
-      ),
-    );
-  }
-}
 
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
