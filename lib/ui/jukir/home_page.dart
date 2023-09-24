@@ -7,7 +7,6 @@ import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_location_response.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
-import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +23,6 @@ import 'dart:typed_data';
 import 'package:sp_util/sp_util.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-// import 'package:http_parser/http_parser.dart';
 
 class HomePageJukir extends StatefulWidget {
   @override

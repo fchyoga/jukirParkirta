@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/data/message/response/parking/parking_location_response.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:jukirparkirta/ui/jukir/api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:jukirparkirta/widget/loading_dialog.dart';
 import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:typed_data';
+
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class RumahPageJukir extends StatefulWidget {
   @override
@@ -18,6 +25,7 @@ class RumahPageJukir extends StatefulWidget {
 class _RumahPageJukirState extends State<RumahPageJukir> {
 
   bool _isLoading = true;
+  final _loadingDialog = LoadingDialog();
 
   late BitmapDescriptor parkIcon;
   late Uint8List customMarker;
@@ -28,14 +36,13 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
   LatLng _myLocation = LatLng(0, 0);
   Set<Marker> _myLocationMarker = {};
   late GoogleMapController _mapsController;
-  List<dynamic>? _parkingLocations;
+  List<ParkingLocation> _parkingLocations = [];
   Set<Polyline> _polylines = {};
 
   @override
   void initState() {
     super.initState();
     _loadParkIcon();
-    _fetchParkingLocations();
     _getUserLocation();
   }
 
@@ -43,6 +50,94 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
   void dispose() {
     _mapsController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+        create: (context) => HomeBloc()..getParkingLocation(),
+        child: BlocListener<HomeBloc, HomeState>(
+            listener: (context, state) async{
+              if (state is LoadingState) {
+                state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
+              } else if (state is SuccessGetParkingLocationState) {
+                setState(() {
+                  _parkingLocations = state.data;
+                });
+              } else if (state is ErrorState) {
+                showTopSnackBar(
+                  context,
+                  CustomSnackBar.error(
+                    message: state.error,
+                  ),
+                );
+              }
+            },
+            child: BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  // _context = context;
+                  return Scaffold(
+                    backgroundColor: Gray100,
+                    appBar: AppBar(
+                      backgroundColor: Red500,
+                      toolbarHeight: 84,
+                      titleSpacing: 0,
+                      elevation: 0,
+                      automaticallyImplyLeading: false,
+                      title: Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 24),
+                            child: Image.asset(
+                              'assets/images/logo-parkirta2.png',
+                              height: 40,
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                        ],
+                      ),
+                      actions: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 24),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ProfilePage()),
+                              );
+                            },
+                            child: CircleAvatar(
+                              backgroundImage: AssetImage('assets/images/profile.png'),
+                              radius: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    body: Stack(
+                      children: [
+                        GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          initialCameraPosition: const CameraPosition(
+                            target: LatLng(-5.143648100120257, 119.48282708990482), // Ganti dengan posisi awal peta
+                            zoom: 20.0,
+                          ),
+                          markers: Set<Marker>.from(_parkingLocations!.map((location) => Marker(
+                            markerId: MarkerId(location.id.toString()),
+                            position: LatLng(
+                              double.parse(location.lat),
+                              double.parse(location.long),
+                            ),
+                            icon: defaultIcon,
+                          ))).union(_myLocationMarker),
+                          polylines: _polylines ?? {},
+                        ),
+                      ],
+                    ),
+                  );
+                })
+        )
+    );
   }
 
   Future<Uint8List> _getBytesFromAsset(String path) async {
@@ -163,82 +258,6 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
     });
   }
 
-  Future<void> _fetchParkingLocations() async {
-    try {
-      List<dynamic> locations = await getLocations();
-      if (mounted) {
-        setState(() {
-          _parkingLocations = locations;
-        });
-      }
-    } catch (error) {
-      // Handle error fetching parking locations
-      print('Error fetching parking locations: $error');
-    }
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Gray100,
-      appBar: AppBar(
-        backgroundColor: Red500,
-        toolbarHeight: 84,
-        titleSpacing: 0,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 24),
-              child: Image.asset(
-                'assets/images/logo-parkirta2.png',
-                height: 40,
-              ),
-            ),
-            SizedBox(width: 16),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 24),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()),
-                );
-              },
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/profile.png'),
-                radius: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(-5.143648100120257, 119.48282708990482), // Ganti dengan posisi awal peta
-              zoom: 20.0,
-            ),
-            markers: _parkingLocations != null
-              ? Set<Marker>.from(_parkingLocations!.map((location) => Marker(
-                  markerId: MarkerId(location['id'].toString()),
-                  position: LatLng(
-                    double.parse(location['lat']),
-                    double.parse(location['long']),
-                  ),
-                  icon: defaultIcon,
-                ))).union(_myLocationMarker)
-              : <Marker>{},
-            polylines: _polylines ?? {},
-          ),
-        ],
-      ),
-    );
-  }
+
 }

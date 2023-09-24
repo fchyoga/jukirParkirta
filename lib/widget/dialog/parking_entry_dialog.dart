@@ -19,18 +19,18 @@ class ParkingEntryDialog extends StatefulWidget {
   ParkingEntryDialog({
     Key? key,
     required this.id,
-    required this.entryDate,
-    required this.memberId,
-    required this.vehicleType,
-    required this.policeNumber,
+    // required this.entryDate,
+    // required this.memberId,
+    // required this.vehicleType,
+    // required this.policeNumber,
     required this.onSuccess,
   }) : super(key: key);
 
-  DateTime entryDate;
+  // DateTime entryDate;
   int id;
-  String memberId;
-  String vehicleType;
-  String policeNumber;
+  // String memberId;
+  // String vehicleType;
+  // String policeNumber;
   Function onSuccess;
   
   @override
@@ -76,18 +76,18 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
                   var provider = context.read<DetailParkingBloc>();
                   return AlertDialog(
                     title: Text('Parkir Arrive'),
-                    content: Column(
+                    content: state is LoadingState ? Column(mainAxisSize: MainAxisSize.min, children: [Container( width: 80, height: 80, padding: EdgeInsets.all(20), child:  CircularProgressIndicator( ),)],): Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('ID Pelanggan: ${widget.memberId}'),
-                        Text('Jenis Kendaraan: ${widget.memberId}'),
-                        Text('Nomor Polisi: ${widget.memberId}'),
-                        Text('Waktu Parkir: ${DateFormat("dd MMM yy HH:mm").format(widget.entryDate)}'),
+                        Text('ID Pelanggan: ${retribution?.pelanggan?.id}'),
+                        Text('Jenis Kendaraan: ${retribution?.jenisKendaraan}'),
+                        Text('Nomor Polisi: ${retribution?.nopol}'),
+                        Text('Waktu Parkir: ${DateFormat("dd MMM yy HH:mm").format(retribution!.createdAt)}'),
                         // Tambahkan informasi lain yang ingin ditampilkan
                       ],
                     ),
-                    actions: [
+                    actions: state is LoadingState ? []: [
                       ElevatedButton.icon(
                         onPressed: state is LoadingState ? (){}: () async {
                           var path = await _takeVehiclePhoto(widget.id); // Mengambil foto kendaraan
