@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:jukirparkirta/data/endpoint.dart';
 import 'package:jukirparkirta/data/message/response/general_response.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_check_detail_response.dart';
+import 'package:jukirparkirta/data/message/response/parking/parking_check_response.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_location_response.dart';
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'package:sp_util/sp_util.dart';
@@ -13,6 +14,28 @@ class ParkingRepository {
 
   String? token = SpUtil.getString(API_TOKEN);
 
+
+  Future<ParkingCheckResponse> checkParking(String id) async {
+    try {
+      Map<String, dynamic> data = {
+        'id_lokasi_parkir': id
+      };
+      var response = await http.post(
+          Uri.parse(Endpoint.urlCheckParking),
+          body: data,
+          headers: {'Authorization': 'Bearer $token'},
+      );
+      debugPrint("response ${response.body}");
+      return response.statusCode == 200 ? parkingCheckResponseFromJson(response.body)
+      : ParkingCheckResponse( success: false, message: "Failed get data", data: []);
+    } on HttpException catch(e, stackTrace){
+      debugPrintStack(label: e.toString(), stackTrace: stackTrace);
+      return ParkingCheckResponse( success: false, message: e.message, data: []);
+    } catch (e, stackTrace) {
+      debugPrintStack(label: e.toString(), stackTrace: stackTrace);
+      return ParkingCheckResponse( success: false, message:  e.toString(), data: []);
+    }
+  }
 
   Future<ParkingCheckDetailResponse> checkDetailParking(String id) async {
     try {

@@ -6,6 +6,7 @@ import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/data/model/retribusi.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:jukirparkirta/utils/contsant/app_colors.dart';
+import 'package:jukirparkirta/utils/contsant/parking_status.dart';
 import 'package:jukirparkirta/widget/button/button_default.dart';
 import 'package:jukirparkirta/widget/loading_dialog.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -149,7 +150,7 @@ class _DetailParkingPageState extends State<DetailParkingPage> {
                             ),
                           ),
 
-                    retribution?.statusParkir == "Proses Pembayaran" && retribution?.pembayaran?.status!= "SUDAH DIBAYAR"? Padding(
+                    (retribution?.statusParkir == ParkingStatus.prosesPembayaran.name || retribution?.statusParkir == ParkingStatus.prosesPembayaranAkhir.name) && retribution?.pembayaran?.status!= "SUDAH DIBAYAR"? Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
                       child:ButtonDefault(title: "Terima Pembayaran", color: AppColors.green, onTap: () async{
                         await Navigator.pushNamed(context, "/payment", arguments: retribution);

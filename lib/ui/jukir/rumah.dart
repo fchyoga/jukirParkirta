@@ -191,14 +191,14 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
       _myLocation = _locationData != null
           ? LatLng(_locationData.latitude!, _locationData.longitude!)
           : LatLng(0, 0);
-      _myLocationMarker = Set<Marker>.from([
+      _myLocationMarker = <Marker>{
         Marker(
           markerId: MarkerId('my_location'),
           position: _myLocation,
           icon: myLocationIcon,
           infoWindow: InfoWindow(title: 'My Location'),
         ),
-      ]);
+      };
     });
 
     // Tambahkan pembaruan lokasi saat posisi berubah
@@ -208,14 +208,14 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
           currentLocation.latitude!,
           currentLocation.longitude!,
         );
-        _myLocationMarker = Set<Marker>.from([
+        _myLocationMarker = <Marker>{
           Marker(
             markerId: MarkerId('my_location'),
             position: _myLocation,
             icon: myLocationIcon,
             infoWindow: InfoWindow(title: 'My Location'),
           ),
-        ]);
+        };
       });
     });
 
