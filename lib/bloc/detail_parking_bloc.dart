@@ -22,6 +22,19 @@ class DetailParkingBloc extends Cubit<DetailParkingState> {
     }
   }
 
+  Future<void> uploadVehiclePhoto(String id, String path) async {
+    emit(LoadingState(true));
+    final response =
+    await _parkingRepository.uploadVehiclePhoto(id, path);
+    emit(LoadingState(false));
+    if (response.success) {
+
+      emit(const UploadVehiclePhotoSuccessState());
+    } else {
+      emit(ErrorState(error: response.message));
+    }
+  }
+
 }
 
 abstract class DetailParkingState {
@@ -34,6 +47,9 @@ class DetailParkingInitial extends DetailParkingState {
 class CheckDetailParkingSuccessState extends DetailParkingState {
   final ParkingCheckDetail data;
   const CheckDetailParkingSuccessState({required this.data});
+}
+class UploadVehiclePhotoSuccessState extends DetailParkingState {
+  const UploadVehiclePhotoSuccessState();
 }
 
 class ErrorState extends DetailParkingState {

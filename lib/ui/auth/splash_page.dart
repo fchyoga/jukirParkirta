@@ -50,7 +50,7 @@ class _SplashPageState extends State<SplashPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Parkirta',
+              'Jukir Parkirta',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

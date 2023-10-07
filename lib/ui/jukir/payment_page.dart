@@ -154,7 +154,7 @@ class _PaymentPageState extends State<PaymentPage> {
          ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () {}),
          const SizedBox(height: 10,),
          ButtonDefault(title: "Cash", color: AppColors.greenLight, textColor: AppColors.green, onTap: (){
-           context.read<PaymentBloc>().paymentJukir("TRX-G95C8Z1P", CASH_CODE, "");
+           context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", CASH_CODE, "");
          }),
 
        ],

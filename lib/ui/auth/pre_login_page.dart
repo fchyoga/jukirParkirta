@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jukirparkirta/bloc/auth_bloc.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/auth/login_page.dart';
 import 'package:jukirparkirta/ui/auth/register_page.dart';
 
@@ -20,6 +21,7 @@ class _PreLoginPageState extends State<PreLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: NavigationService.navigatorKey,
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
@@ -33,7 +35,7 @@ class _PreLoginPageState extends State<PreLoginPage> {
             ),
             const SizedBox(height: 40),
             Text(
-              'Selamat datang di Parkirta!',
+              'Selamat datang di Aplikasi Jukir Parkirta!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -57,10 +59,9 @@ class _PreLoginPageState extends State<PreLoginPage> {
                   TextButton(
                       onPressed: () {
                         context.read<AuthenticationBloc>().unAuthenticatedEvent();
-                        Navigator.pushNamedAndRemoveUntil(
+                        Navigator.pushNamed(
                           context,
-                          "/",
-                              (route) => false,
+                          "/login",
                         );
                     },
                     style: ButtonStyle(
