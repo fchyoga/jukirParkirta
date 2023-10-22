@@ -1,19 +1,55 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_check_response.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_location_response.dart';
 import 'package:jukirparkirta/data/repository/parking_repository.dart';
+import 'package:jukirparkirta/data/repository/user_repository.dart';
+import 'package:jukirparkirta/utils/contsant/user_const.dart';
+import 'package:jukirparkirta/utils/list.dart';
 import 'package:sp_util/sp_util.dart';
 
 class HomeBloc extends Cubit<HomeState> {
   final ParkingRepository _parkingRepository = ParkingRepository();
+  final UserRepository _userRepository = UserRepository();
 
   HomeBloc() : super(Initial());
 
-  void initial(){
-    emit(Initial());
-  }
 
+  Future<void> initial() async {
+    emit(LoadingState(true));
+    int? userId = SpUtil.getInt(USER_ID, defValue: null);
+    int? locationId = SpUtil.getInt(LOCATION_ID, defValue: null);
+    debugPrint("userid $userId locationId $locationId");
+    if(userId == null){
+      final response =
+      await _userRepository.profile();
+      if (response.success) {
+        SpUtil.putInt(USER_ID, response.data!.id);
+        userId = response.data!.id;
+      }
+    }
+    if(locationId==null){
+      final responseLoc = await _parkingRepository.parkingLocation();
+      emit(LoadingState(false));
+      if (responseLoc.success) {
+        var location = responseLoc.data.firstWhereOrNull((e) => e.relasiJukir.any((i) => i.id == userId));
+
+        debugPrint("location ${responseLoc.data.length} ${location?.toJson()}");
+        if(location!=null) {
+          SpUtil.putInt(LOCATION_ID, location.id);
+          locationId = location.id;
+        }
+        debugPrint("locationId $locationId");
+        emit(SuccessGetParkingLocationState(data: responseLoc.data));
+      } else {
+        emit(ErrorState(error: responseLoc.message));
+      }
+    }else{
+      emit(LoadingState(false));
+    }
+    getParkingUser();
+  }
 
   Future<void> getParkingLocation() async {
     emit(LoadingState(true));
@@ -27,10 +63,10 @@ class HomeBloc extends Cubit<HomeState> {
     }
   }
 
-  Future<void> getParkingUser(String id) async {
+  Future<void> getParkingUser() async {
     emit(LoadingState(true));
     final response =
-        await _parkingRepository.checkParking(id);
+        await _parkingRepository.checkParking();
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessGetParkingUserState(data: response.data));

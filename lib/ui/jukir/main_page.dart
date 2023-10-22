@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:jukirparkirta/bloc/auth_bloc.dart';
+import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
@@ -34,21 +35,23 @@ class _MainPageState extends State<MainPage> {
   Map<String, dynamic> userData = {};
   late BuildContext _context;
   late List<Widget> _pages = [
-    RumahPageJukir(),
+    HomePageJukir(),
     ParkingPage(),
   ];
 
   @override
   void initState() {
     _requestPermissions();
-    fetchUserData();
+    // fetchUserData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     _context = context;
-    return Scaffold(
+    return BlocProvider(
+        create: (context) => HomeBloc()..initial(),
+        child: Scaffold(
       key: NavigationService.navigatorKey,
       backgroundColor: Gray100,
       body: IndexedStack(
@@ -144,7 +147,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ): null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
+    ));
   }
 
   Future<void> fetchUserData() async {

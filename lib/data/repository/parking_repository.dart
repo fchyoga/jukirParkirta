@@ -15,16 +15,19 @@ class ParkingRepository {
   String? token = SpUtil.getString(API_TOKEN);
 
 
-  Future<ParkingCheckResponse> checkParking(String id) async {
+  Future<ParkingCheckResponse> checkParking() async {
     try {
+      int? id = SpUtil.getInt(USER_ID);
       Map<String, dynamic> data = {
-        'id_lokasi_parkir': id
+        'id_jukir': id.toString()
       };
       var response = await http.post(
           Uri.parse(Endpoint.urlCheckParking),
           body: data,
           headers: {'Authorization': 'Bearer $token'},
       );
+      debugPrint("url ${Endpoint.urlCheckParking}");
+      debugPrint("request $data");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingCheckResponseFromJson(response.body)
       : ParkingCheckResponse( success: false, message: "Failed get data", data: []);
@@ -43,6 +46,7 @@ class ParkingRepository {
           Uri.parse("${Endpoint.urlCheckDetailParking}/$id"),
           headers: {'Authorization': 'Bearer $token'},
       );
+      debugPrint("url ${Endpoint.urlCheckDetailParking}/$id");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingCheckDetailResponseFromJson(response.body)
       : ParkingCheckDetailResponse( success: false, message: "Failed get data");
@@ -97,9 +101,10 @@ class ParkingRepository {
   Future<ParkingLocationResponse> parkingLocation() async {
     try {
       var response = await http.get(
-        Uri.parse("${Endpoint.urlParkingLocation}"),
+        Uri.parse(Endpoint.urlParkingLocation),
         headers: {'Authorization': 'Bearer $token'},
       );
+      debugPrint("url ${Endpoint.urlParkingLocation}");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingLocationResponseFromJson(response.body)
           : ParkingLocationResponse( success: false, message: "Failed get data", data: []);

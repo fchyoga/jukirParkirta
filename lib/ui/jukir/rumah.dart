@@ -40,10 +40,17 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
   Set<Polyline> _polylines = {};
 
   @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void initState() {
-    super.initState();
     _loadParkIcon();
     _getUserLocation();
+    super.initState();
   }
 
   @override
@@ -54,9 +61,7 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => HomeBloc()..getParkingLocation(),
-        child: BlocListener<HomeBloc, HomeState>(
+    return BlocListener<HomeBloc, HomeState>(
             listener: (context, state) async{
               if (state is LoadingState) {
                 state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
@@ -136,8 +141,7 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
                     ),
                   );
                 })
-        )
-    );
+        );
   }
 
   Future<Uint8List> _getBytesFromAsset(String path) async {
