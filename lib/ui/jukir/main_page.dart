@@ -25,19 +25,13 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-void main() {
-  runApp(MainPage());
-}
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   HomePageJukir? homePageJukir;
   Map<String, dynamic> userData = {};
+  String? userStatus = SpUtil.getString(USER_STATUS);
   late BuildContext _context;
-  late List<Widget> _pages = [
-    HomePageJukir(),
-    ParkingPage(),
-  ];
 
   @override
   void initState() {
@@ -56,7 +50,10 @@ class _MainPageState extends State<MainPage> {
       backgroundColor: Gray100,
       body: IndexedStack(
         index: _currentIndex,
-        children: _pages.whereType<Widget>().toList(),
+        children: [
+          HomePageJukir(),
+          ParkingPage(),
+        ],
       ),
       bottomNavigationBar:  Container(
           color: Colors.white,
@@ -136,9 +133,9 @@ class _MainPageState extends State<MainPage> {
             ),
             child: InkWell(
               onTap: () {
-                Navigator.push(
+                Navigator.pushReplacementNamed(
                   context,
-                  MaterialPageRoute(builder: (context) => MainPage()),
+                  "/",
                 );
               },
               child: SvgPicture.asset("assets/images/ic_discovery.svg"),
@@ -150,38 +147,6 @@ class _MainPageState extends State<MainPage> {
     ));
   }
 
-  Future<void> fetchUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final response = await http.get(
-      Uri.parse('https://parkirta.com/api/profile/detail'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-    if (response.statusCode == 200) {
-      setState(() {
-        userData = jsonDecode(response.body)['data'];
-        _pages = [
-          if (userData['status_jukir'] == 'Aktif')
-            HomePageJukir()
-          else
-            RumahPageJukir(),
-          ParkingPage(),
-        ];
-      });
-    } else if (response.statusCode == 403) {
-      showTopSnackBar(_context, CustomSnackBar.error(
-        message: "Sesi anda telah habis. Silakan login kembali",
-      ));
-      _context.read<AuthenticationBloc>().authenticationExpiredEvent();
-      Navigator.pushNamedAndRemoveUntil(_context, "/", (route) => false);
-    } else {
-      print(response.body);
-      throw Exception('Failed to fetch user data');
-    }
-  }
 
   Future<void> _requestPermissions() async {
     if (Platform.isIOS) {

@@ -17,18 +17,15 @@ class HomeBloc extends Cubit<HomeState> {
 
 
   Future<void> initial() async {
+    String? userStatus = SpUtil.getString(USER_STATUS);
+    if(userStatus!="Aktif"){
+      return;
+    }
+
     emit(LoadingState(true));
     int? userId = SpUtil.getInt(USER_ID, defValue: null);
     int? locationId = SpUtil.getInt(LOCATION_ID, defValue: null);
     debugPrint("userid $userId locationId $locationId");
-    if(userId == null){
-      final response =
-      await _userRepository.profile();
-      if (response.success) {
-        SpUtil.putInt(USER_ID, response.data!.id);
-        userId = response.data!.id;
-      }
-    }
     if(locationId==null){
       final responseLoc = await _parkingRepository.parkingLocation();
       emit(LoadingState(false));

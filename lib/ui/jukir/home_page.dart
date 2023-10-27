@@ -39,6 +39,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
   final _loadingDialog = LoadingDialog();
   int? locationId = SpUtil.getInt(LOCATION_ID);
   int? userId = SpUtil.getInt(USER_ID);
+  String? userStatus = SpUtil.getString(USER_STATUS);
 
   
   final ImagePicker _imagePicker = ImagePicker();
@@ -337,8 +338,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
       if (dataList.isNotEmpty) {
         data = dataList.firstWhere((entry) => entry['id'] == parkingId, orElse: () => Map<String, dynamic>.from({}));
       }
-    } catch (error) {
-      print('Error: $error');
+    } catch (error, stackTrace) {
+      debugPrintStack(label: 'Error: $error', stackTrace: stackTrace);
     }
 
     showDialog(
@@ -502,8 +503,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
     var markers = data.map((e) => Marker(
       markerId: MarkerId(e.id.toString()),
       position: LatLng(
-        double.parse(e.lokasiParkir.lat),
-        double.parse(e.lokasiParkir.long),
+        double.parse(e.lat),
+        double.parse(e.long),
       ),
       icon: e.statusParkir==ParkingStatus.menungguJukir.name? defaultIcon: parkIcon,
       onTap: () {
@@ -512,7 +513,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
     )).toList();
     _parkingMarker = markers;
     setState(() {
-      debugPrint("parking marker ${data.map((e) => "${e.statusParkir} ${e.lokasiParkir.lat},${e.lokasiParkir.long}. ")}");
+      debugPrint("parking marker ${data.map((e) => "${e.statusParkir} ${e.lat},${e.long}. ")}");
     });
   }
 
@@ -665,7 +666,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
                     },
                   )
               ),
-              Positioned(
+              userStatus == "Aktif"? Positioned(
                 bottom: 64,
                 left: 30,
                 right: 30,
@@ -731,7 +732,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
                     ),
                   ),
                 ),
-              ),
+              ): SizedBox.shrink(),
             ],
           )
       ),

@@ -28,6 +28,7 @@ dependencies:
   top_snackbar_flutter: ^1.0.0
   flutter_local_notifications: ^9.9.1
   firebase_messaging: ^14.1.0
+  nfc_manager: ^3.3.0
 
 
 dev_dependencies:

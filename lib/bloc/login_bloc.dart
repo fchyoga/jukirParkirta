@@ -19,8 +19,9 @@ class LoginBloc extends Cubit<LoginState> {
     if (response.success) {
 
       SpUtil.putString(API_TOKEN, response.data?.token ?? "");
-      // SpUtil.putInt(USER_ID, response.data?.user.id ?? 0);
+      SpUtil.putInt(USER_ID, response.data?.id ?? 0);
       SpUtil.putString(USER_NAME, response.data?.name?? "");
+      SpUtil.putString(USER_STATUS, response.data?.status?? "");
       SpUtil.putString(EMAIL, response.data?.email?? "");
       SpUtil.putBool(IS_LOGGED_IN, true);
 

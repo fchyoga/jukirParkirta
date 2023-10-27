@@ -7,6 +7,7 @@ import 'package:jukirparkirta/utils/contsant/app_colors.dart';
 import 'package:jukirparkirta/utils/contsant/transaction_const.dart';
 import 'package:jukirparkirta/widget/button/button_default.dart';
 import 'package:jukirparkirta/widget/loading_dialog.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -151,7 +152,35 @@ class _PaymentPageState extends State<PaymentPage> {
 
          const SizedBox(height: 80,),Text("Metode pembayaran", style: const TextStyle(fontWeight: FontWeight.bold)),
          const SizedBox(height: 10,),
-         ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () {}),
+         ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () async {
+           bool isAvailable = await NfcManager.instance.isAvailable();
+           if(!isAvailable){
+             showTopSnackBar(
+               context,
+               const CustomSnackBar.error(
+                 message: "NFC tidak tersedia",
+               ),
+             );
+             return;
+           }
+
+           // Start Session
+           NfcManager.instance.startSession(
+             onDiscovered: (NfcTag tag) async {
+               print('discovered ${tag.data}');
+               Ndef? ndef = Ndef.from(tag);
+
+               if (ndef == null) {
+                 print('Tag is not compatible with NDEF');
+                 return;
+               }
+             },
+           );
+
+           await showBottomSheetWaiting(context);
+           // Stop Session
+           NfcManager.instance.stopSession();
+         }),
          const SizedBox(height: 10,),
          ButtonDefault(title: "Cash", color: AppColors.greenLight, textColor: AppColors.green, onTap: (){
            context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", CASH_CODE, "");
@@ -163,12 +192,9 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
 
-  void showBottomSheetWaiting(BuildContext _context) {
+  Future<void> showBottomSheetWaiting(BuildContext _context) async{
 
-    Timer(Duration(seconds: 5), (){
-      Navigator.of(context).pushNamed("/payment_success");
-    });
-    showModalBottomSheet(
+    await showModalBottomSheet(
         context: _context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
@@ -189,7 +215,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Menunggu Konfirmasi \nJuru Parkir",
+                      "Tempelkan kartu pada bagian belakang handphone",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.text,
