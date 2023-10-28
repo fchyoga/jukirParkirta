@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
+import 'package:jukirparkirta/data/message/response/parking/parking_check_response.dart';
 import 'package:jukirparkirta/ui/jukir/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,112 +15,26 @@ class ParkingPage extends StatefulWidget {
 }
 
 class _ParkingPageState extends State<ParkingPage> {
-  List<Map<String, dynamic>> parkingData = [];
+  List<ParkingUser> parkingData = [];
 
   @override
   void initState() {
     super.initState();
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    try {
-      final userId = await getUserId();
-      final locationId = await getLocationParkingId(userId);
-      final data = await getParkingData(locationId);
-
-      setState(() {
-        parkingData = data;
-      });
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
-
-  Future<int> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final response = await http.get(
-      Uri.parse('https://parkirta.com/api/profile/detail'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final id = data['data']['id'];
-      print('User ID: $id'); // Print the user ID for verification
-      return id;
-    } else {
-      print('Failed to fetch user ID - Status Code: ${response.statusCode}');
-      throw Exception('Failed to fetch user ID');
-    }
-  }
-
-  Future<int> getLocationParkingId(int userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final response = await http.get(
-      Uri.parse('https://parkirta.com/api/master/lokasi_parkir'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final locations = data['data'];
-      final location = locations.firstWhere(
-        (loc) => loc['relasi_jukir'] != null && loc['relasi_jukir'][0]['id_jukir'] == userId,
-        orElse: () => null,
-      );
-
-      if (location != null) {
-        final locationId = location['id'];
-        print('Location ID: $locationId');
-        return locationId;
-      } else {
-        throw Exception('No matching location found');
-      }
-    } else {
-      print('Failed to fetch user ID - Status Code: ${response.statusCode}');
-      throw Exception('Failed to fetch location parking ID');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> getParkingData(int locationId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    final response = await http.post(
-      Uri.parse('https://parkirta.com/api/retribusi/parking/check'),
-      body: jsonEncode({
-        'id_lokasi_parkir': locationId,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final parkings = List<Map<String, dynamic>>.from(data['data']);
-      parkings.sort((a, b) => b['id'].compareTo(a['id']));
-      print('Parkir Data ID: $parkings');
-      return parkings;
-    } else {
-      print('Failed to fetch user ID - Status Code: ${response.statusCode}');
-      throw Exception('Failed to fetch parking data');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<HomeBloc, HomeState>(
+        listener: (context, state) async{
+          if (state is SuccessGetParkingUserState) {
+            setState(() {
+              parkingData = state.data;
+            });
+          }
+          },
+        child: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              return Scaffold(
       backgroundColor: Gray100,
       appBar: AppBar(
         backgroundColor: Gray100,
@@ -161,14 +78,14 @@ class _ParkingPageState extends State<ParkingPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async{
-          return await fetchData();
+
+          return await context.read<HomeBloc>().getParkingUser();
         },
         child: ListView.builder(
           itemCount: parkingData.length,
           itemBuilder: (context, index) {
-            var kendaraan = parkingData[index];
-            var icon =
-            kendaraan['jenis_kendaraan'] == 'Mobil' ? Icons.directions_car : Icons.motorcycle;
+            var item = parkingData[index];
+            var icon = item.jenisKendaraan == 'Mobil' ? Icons.directions_car : Icons.motorcycle;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -190,7 +107,7 @@ class _ParkingPageState extends State<ParkingPage> {
                   child: ListTile(
                     leading: Icon(icon, color: Colors.red[500]),
                     title: Text(
-                      'Nomor Polisi: ${kendaraan['nopol']}',
+                      'Nomor Polisi: ${item.nopol ?? "-"}',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -201,7 +118,7 @@ class _ParkingPageState extends State<ParkingPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Status: ${kendaraan['status_parkir']}',
+                          'Status: ${item.statusParkir}',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.normal,
@@ -209,7 +126,7 @@ class _ParkingPageState extends State<ParkingPage> {
                           ),
                         ),
                         Text(
-                          'Durasi Parkir: ${kendaraan['lama_parkir']} jam',
+                          'Durasi Parkir: ${item.lamaParkir} jam',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.normal,
@@ -222,7 +139,7 @@ class _ParkingPageState extends State<ParkingPage> {
                       Navigator.pushNamed(
                         context,
                         "/detail_parking",
-                        arguments: kendaraan['id'],
+                        arguments: item.id,
                       );
                     },
                   ),
@@ -232,6 +149,6 @@ class _ParkingPageState extends State<ParkingPage> {
           },
         ),
       ),
-    );
+    ); }));
   }
 }
