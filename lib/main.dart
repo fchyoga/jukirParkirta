@@ -13,6 +13,7 @@ import 'package:jukirparkirta/ui/jukir/detail_parking_page.dart';
 import 'package:jukirparkirta/ui/jukir/main_page.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
+import 'package:jukirparkirta/ui/jukir/notification_page.dart';
 import 'package:jukirparkirta/ui/jukir/payment_page.dart';
 import 'package:jukirparkirta/utils/contsant/authentication.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -141,6 +142,7 @@ class MainApp extends StatefulWidget {
           '/home': (context) => HomePageJukir(),
           '/detail_parking': (context) => DetailParkingPage(),
           '/payment': (context) => PaymentPage(),
+          '/notification': (context) => NotificationPage(),
         }
     );
   }

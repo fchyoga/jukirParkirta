@@ -585,7 +585,9 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 borderRadius: BorderRadius.circular(35),
                 border: Border.all(width: 0.5, color: Colors.white.withOpacity(0.5))),
             child: IconButton(
-              onPressed: (){},
+              onPressed: (){
+                Navigator.pushNamed(context, '/notification');
+              },
               icon: SvgPicture.asset("assets/images/ic_notification.svg", width: 14),
             ),
           ),

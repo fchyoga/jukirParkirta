@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jukirparkirta/bloc/detail_parking_bloc.dart';
 import 'package:jukirparkirta/data/model/retribusi.dart';
+import 'package:jukirparkirta/utils/contsant/parking_status.dart';
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'package:http/http.dart' as http;
 import 'package:sp_util/sp_util.dart';
@@ -55,6 +56,11 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
               if (state is LoadingState) {
                 // state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
               } else if (state is CheckDetailParkingSuccessState) {
+                if(state.data.retribusi.statusParkir != ParkingStatus.menungguJukir.name){
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed('/detail_parking', arguments:state.data.retribusi.id);
+                }
+
                 setState(() {
                   retribution = state.data.retribusi;
                 });

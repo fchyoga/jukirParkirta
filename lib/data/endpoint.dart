@@ -8,6 +8,8 @@ class Endpoint {
 
   static const String urlLogin= '${_baseUrl}login/jukir';
   static const String urlProfile= '${_baseUrl}profile/detail';
+  static const String urlNotification= '${_baseUrl}notifikasi/jukir';
+  static const String urlReadNotification= '${_baseUrl}notifikasi/jukir/read/update';
   static const String urlParkingLocation= '${_baseUrl}master/lokasi_parkir';
   static const String urlArrival= '${_baseUrl}retribusi/parking/arrive';
   static const String urlCheckParking= '${_baseUrl}retribusi/parking/check/jukir';
