@@ -35,7 +35,7 @@ class Notification {
     int referenceId;
     String topic;
     String title;
-    String message;
+    String? message;
     int isRead;
     DateTime createdAt;
     DateTime updatedAt;
@@ -47,7 +47,7 @@ class Notification {
         required this.referenceId,
         required this.topic,
         required this.title,
-        required this.message,
+        this.message,
         required this.isRead,
         required this.createdAt,
         required this.updatedAt,

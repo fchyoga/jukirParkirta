@@ -152,7 +152,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
          const SizedBox(height: 80,),Text("Metode pembayaran", style: const TextStyle(fontWeight: FontWeight.bold)),
          const SizedBox(height: 10,),
-         ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () async {
+         retribution?.idMetodePembayaran!= 1 ? ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () async {
            bool isAvailable = await NfcManager.instance.isAvailable();
            if(!isAvailable){
              showTopSnackBar(
@@ -208,11 +208,11 @@ class _PaymentPageState extends State<PaymentPage> {
            );
 
           await showBottomSheetWaiting(context);
-         }),
+         }): SizedBox(height: 0,),
          const SizedBox(height: 10,),
-         ButtonDefault(title: "Cash", color: AppColors.greenLight, textColor: AppColors.green, onTap: (){
+         retribution?.idMetodePembayaran!= 0 ? ButtonDefault(title: "Cash", color: AppColors.green, onTap: (){
            context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", CASH_CODE, "");
-         }),
+         }): SizedBox(height: 0,),
 
        ],
       ),

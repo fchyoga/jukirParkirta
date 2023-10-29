@@ -36,6 +36,7 @@ class _NotificationPageState extends State<NotificationPage> {
               } else if (state is NotificationSuccessState) {
                 setState(() {
                   notifications = state.data;
+                  notifications.sort((a, b) => b.id.compareTo(a.id));
                 });
               } else if (state is ErrorState) {
                 showTopSnackBar(
@@ -71,7 +72,9 @@ class _NotificationPageState extends State<NotificationPage> {
                       ),
                     ),
                     body: RefreshIndicator(
-                      onRefresh: () async{},
+                      onRefresh: () async{
+                        return await provider.getNotification();
+                      },
                       child: notifications.isNotEmpty ? ListView(
                         padding: EdgeInsets.only(top: 20),
                         children: notifications.map((e) => InkWell(
@@ -99,7 +102,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(e.title, style: TextStyle(color: AppColors.text, fontWeight: e.isRead == 0? FontWeight.bold: FontWeight.normal, fontSize: 14),),
-                                            Text(e.message, style: TextStyle(color: AppColors.textPassive, fontWeight: FontWeight.normal, fontSize: 12),),
+
+                                            e.message!=null ? Text(e.message!, style: TextStyle(color: AppColors.textPassive, fontWeight: FontWeight.normal, fontSize: 12),): Container(),
                                           ],
                                         )),
                                         Text(DateFormat("dd MMM yy \nHH:mm").format(e.createdAt), textAlign: TextAlign.right, style: TextStyle(color: AppColors.text, fontWeight: FontWeight.normal, fontSize: 10),),
@@ -139,11 +143,16 @@ class _NotificationPageState extends State<NotificationPage> {
         }
       });
     }
-    if(e.topic == PAYMENT_ENTRY || (e.topic == PARKING_ARRIVE && e.isRead == 1)){
+    if(e.topic == PAYMENT_ENTRY){
       Navigator.pushNamed(context, '/detail_parking', arguments: e.referenceId);
     }else if(e.topic == PARKING_ARRIVE){
       showDialog(context: context, builder: (_) => ParkingEntryDialog(id:  e.referenceId, onSuccess: (){
-
+        showTopSnackBar(
+          context,
+          CustomSnackBar.success(
+            message: "Foto kendaraan berhasil diupload",
+          ),
+        );
       }));
     }
   }

@@ -9,11 +9,10 @@ class Retribusi {
     int id;
 
     int idPelanggan;
-
+    int? idMetodePembayaran;
     int? idJukir;
 
     int idLokasiParkir;
-    dynamic idMetodePembayaran;
     dynamic idBiayaParkir;
 
     String lat;
