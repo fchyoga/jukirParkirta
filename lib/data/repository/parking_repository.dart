@@ -98,6 +98,32 @@ class ParkingRepository {
     }
   }
 
+  Future<GeneralResponse> updateParkingStatus(String status) async {
+    try {
+      int? locationId = SpUtil.getInt(LOCATION_ID);
+      Map<String, dynamic> data = {
+        'id_lokasi_parkir': locationId.toString(),
+        'status': status
+      };
+      var response = await http.post(
+        Uri.parse(Endpoint.urlUpdateParkingStatus),
+        body: data,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      debugPrint("url ${Endpoint.urlUpdateParkingStatus}");
+      debugPrint("request $data");
+      debugPrint("response ${response.body}");
+      return response.statusCode == 200 ? generalResponseFromJson(response.body)
+          : GeneralResponse( success: false, message: "Failed get data");
+    } on HttpException catch(e, stackTrace){
+      debugPrintStack(label: e.toString(), stackTrace: stackTrace);
+      return GeneralResponse( success: false, message: e.message);
+    } catch (e, stackTrace) {
+      debugPrintStack(label: e.toString(), stackTrace: stackTrace);
+      return GeneralResponse( success: false, message:  e.toString());
+    }
+  }
+
   Future<ParkingLocationResponse> parkingLocation() async {
     try {
       var response = await http.get(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
@@ -565,7 +566,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
         title: Row(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 24),
+              padding: const EdgeInsets.only(left: 20),
               child: Image.asset(
                 'assets/images/logo-parkirta2.png',
                 height: 40,
@@ -575,8 +576,23 @@ class _HomePageJukirState extends State<HomePageJukir> {
           ],
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 24),
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            width: 35,
+            height: 35,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(35),
+                border: Border.all(width: 0.5, color: Colors.white.withOpacity(0.5))),
+            child: IconButton(
+              onPressed: (){},
+              icon: SvgPicture.asset("assets/images/ic_notification.svg", width: 14),
+            ),
+          ),
+          Container(
+            width: 40,
+            height: 40,
+            margin: const EdgeInsets.only(right: 20),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -702,7 +718,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
                           onChanged: (String? newValue) {
                             setState(() {
                               _selectedStatus = newValue!;
-                              _updateParkingStatus(newValue);
+                              context.read<HomeBloc>().updateParkingStatus(newValue);
+                              // _updateParkingStatus(newValue);
                             });
                           },
                           items: _statusOptions.map((String status) {

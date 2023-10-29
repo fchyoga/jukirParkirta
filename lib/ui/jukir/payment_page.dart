@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jukirparkirta/data/model/record.dart';
 import 'package:jukirparkirta/bloc/payment_bloc.dart';
 import 'package:jukirparkirta/utils/contsant/app_colors.dart';
 import 'package:jukirparkirta/utils/contsant/transaction_const.dart';
@@ -29,6 +29,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Duration? duration;
   String? paymentStep;
 
+  BuildContext? ctxSheetBottom;
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +135,7 @@ class _PaymentPageState extends State<PaymentPage> {
                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                  children: [
                    Text("Tarif Per-Jam : ", style: TextStyle(fontWeight: FontWeight.normal)),
-                   Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}", style: TextStyle(fontWeight: FontWeight.normal)),
-
+                   Text("Rp ${retribution!.pembayaran?.grossAmount ?? 0}", style: TextStyle(fontWeight: FontWeight.normal)),
                  ],
                ),
                const SizedBox(height: 5),
@@ -143,7 +143,7 @@ class _PaymentPageState extends State<PaymentPage> {
                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                  children: [
                    const Text("Total : ", style: TextStyle(fontWeight: FontWeight.bold)),
-                   Text("Rp ${getTotalPrice() ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                   Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
                  ],
                ),
              ],
@@ -167,19 +167,47 @@ class _PaymentPageState extends State<PaymentPage> {
            // Start Session
            NfcManager.instance.startSession(
              onDiscovered: (NfcTag tag) async {
-               print('discovered ${tag.data}');
+               if(ctxSheetBottom==null) return;
+
+               String? cardNumber;
                Ndef? ndef = Ndef.from(tag);
 
                if (ndef == null) {
-                 print('Tag is not compatible with NDEF');
+                 showTopSnackBar(
+                   context,
+                   const CustomSnackBar.error(
+                     message: "Kartu tidak compatible",
+                   ),
+                 );
                  return;
                }
+               var read =  ndef.cachedMessage;
+               read?.records.forEach((e) {
+                 var data = Record.fromNdef(e);
+                 if(data is WellknownTextRecord){
+                   cardNumber = data.text;
+                 }
+               });
+
+               if(cardNumber == null){
+                 showTopSnackBar(
+                   context,
+                   const CustomSnackBar.error(
+                     message: "Kartu tidak dapat dikenali",
+                   ),
+                 );
+                 return;
+               }
+
+               Timer(const Duration(milliseconds: 500),(){
+                 Navigator.pop(ctxSheetBottom!);
+
+                 context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", USE_CARD_CODE, cardNumber!);
+               });
              },
            );
 
-           await showBottomSheetWaiting(context);
-           // Stop Session
-           NfcManager.instance.stopSession();
+          await showBottomSheetWaiting(context);
          }),
          const SizedBox(height: 10,),
          ButtonDefault(title: "Cash", color: AppColors.greenLight, textColor: AppColors.green, onTap: (){
@@ -194,12 +222,12 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> showBottomSheetWaiting(BuildContext _context) async{
 
-    await showModalBottomSheet(
+    var sb =  showModalBottomSheet(
         context: _context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
         builder: (context) {
-
+          ctxSheetBottom = context;
           return SingleChildScrollView(
             child: AnimatedPadding(
               padding: MediaQuery.of(context).viewInsets,
@@ -236,7 +264,14 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
             ),
           );
-        });
+        }).whenComplete(() {
+      ctxSheetBottom = null;
+
+      // Stop Session
+      debugPrint("stop season");
+      NfcManager.instance.stopSession();
+    });
+
   }
 
   String? getDurationString(){

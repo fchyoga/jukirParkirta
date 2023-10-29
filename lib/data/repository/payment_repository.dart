@@ -23,6 +23,7 @@ class PaymentRepository {
           body: data,
           headers: {'Authorization': 'Bearer $token'},
       );
+      debugPrint("request ${data}");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 || response.statusCode == 404 ? generalResponseFromJson(response.body)
       : GeneralResponse( success: false, message: "Failed submit payment check");

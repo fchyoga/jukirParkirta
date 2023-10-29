@@ -13,5 +13,6 @@ class Endpoint {
   static const String urlCheckParking= '${_baseUrl}retribusi/parking/check/jukir';
   static const String urlCheckDetailParking= '${_baseUrl}retribusi/parking/check/detail';
   static const String urlUploadPhotoVehicle= '${_baseUrl}retribusi/upload/foto_kendaraan';
+  static const String urlUpdateParkingStatus= '${_baseUrl}retribusi/parking/status';
   static const String urlPayment= '${_baseUrl}retribusi/payment/jukir';
 }

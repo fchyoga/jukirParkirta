@@ -71,6 +71,18 @@ class HomeBloc extends Cubit<HomeState> {
       emit(ErrorState(error: response.message));
     }
   }
+
+  Future<void> updateParkingStatus(String status) async {
+    emit(LoadingState(true));
+    final response =
+        await _parkingRepository.updateParkingStatus(status);
+    emit(LoadingState(false));
+    if (response.success) {
+      emit(SuccessUpdateParkingState());
+    } else {
+      emit(ErrorState(error: response.message));
+    }
+  }
 }
 
 abstract class HomeState {
@@ -88,6 +100,9 @@ class SuccessGetParkingLocationState extends HomeState {
 class SuccessGetParkingUserState extends HomeState {
   final List<ParkingUser> data;
   const SuccessGetParkingUserState({required this.data});
+}
+class SuccessUpdateParkingState extends HomeState {
+  const SuccessUpdateParkingState();
 }
 
 class ErrorState extends HomeState {
