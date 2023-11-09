@@ -15,10 +15,9 @@ class HomeBloc extends Cubit<HomeState> {
 
   HomeBloc() : super(Initial());
 
-
   Future<void> initial() async {
     String? userStatus = SpUtil.getString(USER_STATUS);
-    if(userStatus!="Aktif"){
+    if (userStatus != "Aktif") {
       return;
     }
 
@@ -26,14 +25,15 @@ class HomeBloc extends Cubit<HomeState> {
     int? userId = SpUtil.getInt(USER_ID, defValue: null);
     int? locationId = SpUtil.getInt(LOCATION_ID, defValue: null);
     debugPrint("userid $userId locationId $locationId");
-    if(locationId==null){
+    if (locationId == null) {
       final responseLoc = await _parkingRepository.parkingLocation();
       emit(LoadingState(false));
       if (responseLoc.success) {
-        var location = responseLoc.data.firstWhereOrNull((e) => e.relasiJukir.any((i) => i.id == userId));
+        var location = responseLoc.data
+            .firstWhereOrNull((e) => e.relasiJukir.any((i) => i.id == userId));
 
         debugPrint("location ${responseLoc.data.length} ${location?.toJson()}");
-        if(location!=null) {
+        if (location != null) {
           SpUtil.putInt(LOCATION_ID, location.id);
           locationId = location.id;
         }
@@ -42,16 +42,16 @@ class HomeBloc extends Cubit<HomeState> {
       } else {
         emit(ErrorState(error: responseLoc.message));
       }
-    }else{
+    } else {
       emit(LoadingState(false));
+      getParkingLocation();
     }
     getParkingUser();
   }
 
   Future<void> getParkingLocation() async {
     emit(LoadingState(true));
-    final response =
-        await _parkingRepository.parkingLocation();
+    final response = await _parkingRepository.parkingLocation();
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessGetParkingLocationState(data: response.data));
@@ -62,8 +62,7 @@ class HomeBloc extends Cubit<HomeState> {
 
   Future<void> getParkingUser() async {
     emit(LoadingState(true));
-    final response =
-        await _parkingRepository.checkParking();
+    final response = await _parkingRepository.checkParking();
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessGetParkingUserState(data: response.data));
@@ -74,8 +73,7 @@ class HomeBloc extends Cubit<HomeState> {
 
   Future<void> updateParkingStatus(String status) async {
     emit(LoadingState(true));
-    final response =
-        await _parkingRepository.updateParkingStatus(status);
+    final response = await _parkingRepository.updateParkingStatus(status);
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessUpdateParkingState());
@@ -89,8 +87,7 @@ abstract class HomeState {
   const HomeState();
 }
 
-class Initial extends HomeState {
-}
+class Initial extends HomeState {}
 
 class SuccessGetParkingLocationState extends HomeState {
   final List<ParkingLocation> data;
@@ -101,6 +98,7 @@ class SuccessGetParkingUserState extends HomeState {
   final List<ParkingUser> data;
   const SuccessGetParkingUserState({required this.data});
 }
+
 class SuccessUpdateParkingState extends HomeState {
   const SuccessUpdateParkingState();
 }
@@ -108,7 +106,6 @@ class SuccessUpdateParkingState extends HomeState {
 class ErrorState extends HomeState {
   final String error;
   const ErrorState({required this.error});
-
 }
 
 class LoadingState extends HomeState {
@@ -116,6 +113,4 @@ class LoadingState extends HomeState {
   LoadingState(this.show);
 }
 
-class PasswordState extends HomeState {
-}
-
+class PasswordState extends HomeState {}
