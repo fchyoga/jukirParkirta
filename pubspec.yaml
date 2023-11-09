@@ -29,6 +29,10 @@ dependencies:
   flutter_local_notifications: ^9.9.1
   firebase_messaging: ^14.1.0
   nfc_manager: ^3.3.0
+  iconly: ^1.0.1
+  path_provider: ^2.1.1
+  dio: ^5.3.3
+  flutter_image_compress: ^2.1.0
 
 
 dev_dependencies:

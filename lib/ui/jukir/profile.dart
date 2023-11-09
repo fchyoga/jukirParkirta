@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/ui/auth/pre_login_page.dart';
 import 'package:jukirparkirta/ui/jukir/aktivasi.dart';
+import 'package:jukirparkirta/ui/jukir/profile_edit.dart';
 import 'package:http/http.dart' as http;
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'dart:convert';
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    selectedLocation = locations.isNotEmpty ? locations.first : '';
     fetchUserData();
     fetchLocationData();
   }
@@ -39,6 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (response.statusCode == 200) {
       setState(() {
         userData = jsonDecode(response.body)['data'];
+        isOnline = userData['kondisi'] == 'Online';
       });
     } else {
       print(response.body);
@@ -74,6 +77,59 @@ class _ProfilePageState extends State<ProfilePage> {
     } else {
       print(response.body);
       throw Exception('Failed to fetch user data');
+    }
+  }
+
+  Future<void> _updateUserStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('https://parkirta.com/api/profile/kondisi/update'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+      body: {
+        'kondisi': isOnline ? 'Online' : 'Offline',
+        'id_lokasi_parkir': selectedLocation,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body)['data'];
+      print('User status updated: $responseData');
+      // You can update the UI or handle the response accordingly
+    } else {
+      print(response.body);
+      throw Exception('Failed to update user status');
+    }
+  }
+
+  Future<void> saveKondisiToAPI(String kondisi, String idLokasi) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('https://parkirta.com/api/profile/kondisi/update'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+      body: {
+        'kondisi': kondisi,
+        'id_lokasi_parkir': idLokasi,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body)['data'];
+      print('User status updated: $responseData');
+      setState(() {
+        userData['kondisi'] = kondisi;
+        selectedLocation = idLokasi;
+      });
+    } else {
+      print(response.body);
+      throw Exception('Failed to update user status');
     }
   }
 
@@ -116,6 +172,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.of(context).pop();
               },
               child: Text('Close'),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateUserStatus();
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
             ),
           ],
         );
@@ -161,6 +224,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   isOnline = value;
                   if (isOnline) {
                     _showLocationPicker();
+                  } else {
+                    // Jika switch diubah menjadi Offline, simpan kondisi ke API
+                    saveKondisiToAPI('Offline', selectedLocation);
                   }
                 });
               },
@@ -215,25 +281,36 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                   height: 48,
                 ),
-              SizedBox(height: 8),
-              buildRoundedButton(
-                text: 'Transaksi',
-                icon: Icons.arrow_forward_ios_rounded,
-                onPressed: () {},
-                height: 48,
-              ),
-              SizedBox(height: 8),
-              buildRoundedButton(
-                text: 'Riwayat Parkir',
-                icon: Icons.arrow_forward_ios_rounded,
-                onPressed: () {},
-                height: 48,
-              ),
+              // SizedBox(height: 8),
+              // buildRoundedButton(
+              //   text: 'Transaksi',
+              //   icon: Icons.arrow_forward_ios_rounded,
+              //   onPressed: () {},
+              //   height: 48,
+              // ),
+              // SizedBox(height: 8),
+              // buildRoundedButton(
+              //   text: 'Riwayat Parkir',
+              //   icon: Icons.arrow_forward_ios_rounded,
+              //   onPressed: () {},
+              //   height: 48,
+              // ),
               SizedBox(height: 8),
               buildRoundedButton(
                 text: 'Edit Profile',
                 icon: Icons.arrow_forward_ios_rounded,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfileEdit(
+                            userName: userData.isNotEmpty
+                                ? userData['nama_lengkap']
+                                : '',
+                            userEmail:
+                                userData.isNotEmpty ? userData['email'] : '')),
+                  );
+                },
                 height: 48,
               ),
               SizedBox(height: 24),
