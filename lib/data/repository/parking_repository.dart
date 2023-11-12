@@ -30,6 +30,7 @@ class ParkingRepository {
       debugPrint("request $data");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingCheckResponseFromJson(response.body)
+      : response.statusCode == 403 ? ParkingCheckResponse( success: false, message: "Unauthorized", data: [])
       : ParkingCheckResponse( success: false, message: "Failed get data", data: []);
     } on HttpException catch(e, stackTrace){
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
@@ -49,7 +50,9 @@ class ParkingRepository {
       debugPrint("url ${Endpoint.urlCheckDetailParking}/$id");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingCheckDetailResponseFromJson(response.body)
-      : ParkingCheckDetailResponse( success: false, message: "Failed get data");
+
+          : response.statusCode == 403 ? ParkingCheckDetailResponse( success: false, message: "Unauthorized")
+          : ParkingCheckDetailResponse( success: false, message: "Failed get data");
     } on HttpException catch(e, stackTrace){
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
       return ParkingCheckDetailResponse( success: false, message: e.message);
@@ -88,6 +91,7 @@ class ParkingRepository {
       debugPrint("request ${request.fields}");
       debugPrint("response ${responseString}");
       return response.statusCode == 200 ? generalResponseFromJson(responseString)
+          : response.statusCode == 403 ? GeneralResponse( success: false, message: "Unauthorized")
       : GeneralResponse( success: false, message: "Gagal upload foto kendaraan");
     } on HttpException catch(e, stackTrace){
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
@@ -114,6 +118,7 @@ class ParkingRepository {
       debugPrint("request $data");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? generalResponseFromJson(response.body)
+          : response.statusCode == 403 ? GeneralResponse( success: false, message: "Unauthorized")
           : GeneralResponse( success: false, message: "Failed get data");
     } on HttpException catch(e, stackTrace){
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
@@ -133,6 +138,7 @@ class ParkingRepository {
       debugPrint("url ${Endpoint.urlParkingLocation}");
       debugPrint("response ${response.body}");
       return response.statusCode == 200 ? parkingLocationResponseFromJson(response.body)
+          : response.statusCode == 403 ? ParkingLocationResponse( success: false, message: "Unauthorized", data:[])
           : ParkingLocationResponse( success: false, message: "Failed get data", data: []);
     } on HttpException catch(e, stackTrace){
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);

@@ -3,22 +3,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:jukirparkirta/bloc/auth_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/main.dart';
 import 'package:jukirparkirta/ui/jukir/home_page.dart';
 import 'package:jukirparkirta/ui/jukir/parking_page.dart';
-import 'package:jukirparkirta/ui/jukir/rumah.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http;
 import 'package:jukirparkirta/utils/contsant/app_colors.dart';
 import 'package:jukirparkirta/utils/contsant/user_const.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sp_util/sp_util.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class MainPage extends StatefulWidget {
   @override

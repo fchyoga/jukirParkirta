@@ -55,6 +55,8 @@ class HomeBloc extends Cubit<HomeState> {
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessGetParkingLocationState(data: response.data));
+    } else if (response.message == "Unauthorized") {
+      emit(SessionExpiredState());
     } else {
       emit(ErrorState(error: response.message));
     }
@@ -67,6 +69,8 @@ class HomeBloc extends Cubit<HomeState> {
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessGetParkingUserState(data: response.data));
+    } else if (response.message == "Unauthorized") {
+      emit(SessionExpiredState());
     } else {
       emit(ErrorState(error: response.message));
     }
@@ -79,6 +83,8 @@ class HomeBloc extends Cubit<HomeState> {
     emit(LoadingState(false));
     if (response.success) {
       emit(SuccessUpdateParkingState());
+    } else if (response.message == "Unauthorized") {
+      emit(SessionExpiredState());
     } else {
       emit(ErrorState(error: response.message));
     }
@@ -105,6 +111,9 @@ class SuccessUpdateParkingState extends HomeState {
   const SuccessUpdateParkingState();
 }
 
+class SessionExpiredState extends HomeState {
+  const SessionExpiredState();
+}
 class ErrorState extends HomeState {
   final String error;
   const ErrorState({required this.error});

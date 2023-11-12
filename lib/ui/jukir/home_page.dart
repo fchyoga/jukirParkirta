@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:jukirparkirta/bloc/auth_bloc.dart';
 import 'package:jukirparkirta/bloc/home_bloc.dart';
 import 'package:jukirparkirta/color.dart';
 import 'package:jukirparkirta/data/message/response/parking/parking_check_response.dart';
@@ -542,6 +543,12 @@ class _HomePageJukirState extends State<HomePageJukir> {
 
                 debugPrint("activeParking ${activeParking.map((e) => e.toJson())}");
                 if(activeParking.isNotEmpty) setParkingMarker(activeParking);
+              } else if (state is SessionExpiredState) {
+                showTopSnackBar(_context, CustomSnackBar.error(
+                  message: "Sesi anda telah habis. Silakan login kembali",
+                ));
+                _context.read<AuthenticationBloc>().authenticationExpiredEvent();
+                Navigator.pushNamedAndRemoveUntil(_context, "/", (route) => false);
               } else if (state is ErrorState) {
                 showTopSnackBar(
                   context,

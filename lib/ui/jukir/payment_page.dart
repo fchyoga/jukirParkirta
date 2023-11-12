@@ -150,7 +150,8 @@ class _PaymentPageState extends State<PaymentPage> {
            ),
          ),
 
-         const SizedBox(height: 80,),Text("Metode pembayaran", style: const TextStyle(fontWeight: FontWeight.bold)),
+         const SizedBox(height: 80,),
+         const Text("Metode pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
          const SizedBox(height: 10,),
          retribution?.idMetodePembayaran!= 1 ? ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () async {
            bool isAvailable = await NfcManager.instance.isAvailable();
