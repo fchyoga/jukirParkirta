@@ -67,6 +67,8 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
               } else if (state is UploadVehiclePhotoSuccessState) {
                 Navigator.of(context).pop(); // Tutup dialog
                 widget.onSuccess();
+              } else if (state is SessionExpiredState) {
+                Navigator.of(context).pop(); // Tutup dialog
               } else if (state is ErrorState) {
                 showTopSnackBar(
                   context,
@@ -89,7 +91,7 @@ class _ParkingEntryDialogState extends State<ParkingEntryDialog> {
                         Text('ID Pelanggan: ${retribution?.pelanggan?.id}'),
                         Text('Jenis Kendaraan: ${retribution?.jenisKendaraan}'),
                         Text('Nomor Polisi: ${retribution?.nopol}'),
-                        Text('Waktu Parkir: ${DateFormat("dd MMM yy HH:mm").format(retribution!.createdAt)}'),
+                        Text('Waktu Parkir: ${retribution == null ? "-": DateFormat("dd MMM yy HH:mm").format(retribution!.createdAt)}'),
                         // Tambahkan informasi lain yang ingin ditampilkan
                       ],
                     ),

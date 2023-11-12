@@ -17,6 +17,8 @@ class DetailParkingBloc extends Cubit<DetailParkingState> {
     if (response.success) {
 
       emit(CheckDetailParkingSuccessState(data: response.data!));
+    } else if (response.message == "Unauthorized") {
+      emit(SessionExpiredState());
     } else {
       emit(ErrorState(error: response.message));
     }
@@ -42,6 +44,9 @@ abstract class DetailParkingState {
 }
 
 class DetailParkingInitial extends DetailParkingState {
+}
+
+class SessionExpiredState extends DetailParkingState {
 }
 
 class CheckDetailParkingSuccessState extends DetailParkingState {
