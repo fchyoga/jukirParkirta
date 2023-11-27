@@ -80,6 +80,31 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Future<void> _updateUserStatus() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+
+  //   final response = await http.post(
+  //     Uri.parse('https://parkirta.com/api/profile/kondisi/update'),
+  //     headers: {
+  //       'Authorization': 'Bearer $token',
+  //     },
+  //     body: {
+  //       'kondisi': isOnline ? 'Online' : 'Offline',
+  //       'id_lokasi_parkir': selectedLocation,
+  //     },
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     final responseData = jsonDecode(response.body)['data'];
+  //     print('User status updated: $responseData');
+  //     // You can update the UI or handle the response accordingly
+  //   } else {
+  //     print(response.body);
+  //     throw Exception('Failed to update user status');
+  //   }
+  // }
+
   Future<void> _updateUserStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -91,7 +116,10 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       body: {
         'kondisi': isOnline ? 'Online' : 'Offline',
-        'id_lokasi_parkir': selectedLocation,
+        'id_lokasi_parkir': locationData
+            .firstWhere(
+                (location) => location['nama_lokasi'] == selectedLocation)['id']
+            .toString(),
       },
     );
 
@@ -137,50 +165,55 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Choose Location'),
-          content: Container(
-            width: double.maxFinite,
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: selectedLocation,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedLocation = value!;
-                });
-              },
-              items: locations.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: SizedBox(
-                    width: double.maxFinite,
-                    child: Text(
-                      value,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Choose Location'),
+              content: Container(
+                width: double.maxFinite,
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: selectedLocation,
+                  onChanged: (String? value) {
+                    setState(() {
+                      selectedLocation = value!;
+                    });
+                  },
+                  items:
+                      locations.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: SizedBox(
+                        width: double.maxFinite,
+                        child: Text(
+                          value,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
-            ),
-            TextButton(
-              onPressed: () {
-                _updateUserStatus();
-                Navigator.of(context).pop();
-              },
-              child: Text('Save'),
-            ),
-          ],
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Close'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _updateUserStatus();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Save'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
