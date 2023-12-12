@@ -11,60 +11,63 @@ import 'package:jukirparkirta/utils/contsant/user_const.dart';
 import 'package:sp_util/sp_util.dart';
 
 class ParkingRepository {
-
   String? token = SpUtil.getString(API_TOKEN);
-
 
   Future<ParkingCheckResponse> checkParking() async {
     try {
       int? id = SpUtil.getInt(USER_ID);
-      Map<String, dynamic> data = {
-        'id_jukir': id.toString()
-      };
+      Map<String, dynamic> data = {'id_jukir': id.toString()};
       var response = await http.post(
-          Uri.parse(Endpoint.urlCheckParking),
-          body: data,
-          headers: {'Authorization': 'Bearer $token'},
+        Uri.parse(Endpoint.urlCheckParking),
+        body: data,
+        headers: {'Authorization': 'Bearer $token'},
       );
       debugPrint("url ${Endpoint.urlCheckParking}");
       debugPrint("request $data");
       debugPrint("response ${response.body}");
-      return response.statusCode == 200 ? parkingCheckResponseFromJson(response.body)
-      : response.statusCode == 403 ? ParkingCheckResponse( success: false, message: "Unauthorized", data: [])
-      : ParkingCheckResponse( success: false, message: "Failed get data", data: []);
-    } on HttpException catch(e, stackTrace){
+      return response.statusCode == 200
+          ? parkingCheckResponseFromJson(response.body)
+          : response.statusCode == 403
+              ? ParkingCheckResponse(
+                  success: false, message: "Unauthorized", data: [])
+              : ParkingCheckResponse(
+                  success: false, message: "Failed get data", data: []);
+    } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingCheckResponse( success: false, message: e.message, data: []);
+      return ParkingCheckResponse(success: false, message: e.message, data: []);
     } catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingCheckResponse( success: false, message:  e.toString(), data: []);
+      return ParkingCheckResponse(
+          success: false, message: e.toString(), data: []);
     }
   }
 
   Future<ParkingCheckDetailResponse> checkDetailParking(String id) async {
     try {
       var response = await http.get(
-          Uri.parse("${Endpoint.urlCheckDetailParking}/$id"),
-          headers: {'Authorization': 'Bearer $token'},
+        Uri.parse("${Endpoint.urlCheckDetailParking}/$id"),
+        headers: {'Authorization': 'Bearer $token'},
       );
       debugPrint("url ${Endpoint.urlCheckDetailParking}/$id");
       debugPrint("response ${response.body}");
-      return response.statusCode == 200 ? parkingCheckDetailResponseFromJson(response.body)
-
-          : response.statusCode == 403 ? ParkingCheckDetailResponse( success: false, message: "Unauthorized")
-          : ParkingCheckDetailResponse( success: false, message: "Failed get data");
-    } on HttpException catch(e, stackTrace){
+      return response.statusCode == 200
+          ? parkingCheckDetailResponseFromJson(response.body)
+          : response.statusCode == 403
+              ? ParkingCheckDetailResponse(
+                  success: false, message: "Unauthorized")
+              : ParkingCheckDetailResponse(
+                  success: false, message: "Failed get data");
+    } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingCheckDetailResponse( success: false, message: e.message);
+      return ParkingCheckDetailResponse(success: false, message: e.message);
     } catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingCheckDetailResponse( success: false, message:  e.toString());
+      return ParkingCheckDetailResponse(success: false, message: e.toString());
     }
   }
 
   Future<GeneralResponse> uploadVehiclePhoto(String id, String path) async {
     try {
-
       // Membuat request multipart
       final request = http.MultipartRequest(
         'POST',
@@ -90,15 +93,18 @@ class ParkingRepository {
 
       debugPrint("request ${request.fields}");
       debugPrint("response ${responseString}");
-      return response.statusCode == 200 ? generalResponseFromJson(responseString)
-          : response.statusCode == 403 ? GeneralResponse( success: false, message: "Unauthorized")
-      : GeneralResponse( success: false, message: "Gagal upload foto kendaraan");
-    } on HttpException catch(e, stackTrace){
+      return response.statusCode == 200
+          ? generalResponseFromJson(responseString)
+          : response.statusCode == 403
+              ? GeneralResponse(success: false, message: "Unauthorized")
+              : GeneralResponse(
+                  success: false, message: "Gagal upload foto kendaraan");
+    } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return GeneralResponse( success: false, message: e.message);
+      return GeneralResponse(success: false, message: e.message);
     } catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return GeneralResponse( success: false, message:  e.toString());
+      return GeneralResponse(success: false, message: e.toString());
     }
   }
 
@@ -117,15 +123,17 @@ class ParkingRepository {
       debugPrint("url ${Endpoint.urlUpdateParkingStatus}");
       debugPrint("request $data");
       debugPrint("response ${response.body}");
-      return response.statusCode == 200 ? generalResponseFromJson(response.body)
-          : response.statusCode == 403 ? GeneralResponse( success: false, message: "Unauthorized")
-          : GeneralResponse( success: false, message: "Failed get data");
-    } on HttpException catch(e, stackTrace){
+      return response.statusCode == 200
+          ? generalResponseFromJson(response.body)
+          : response.statusCode == 403
+              ? GeneralResponse(success: false, message: "Unauthorized")
+              : GeneralResponse(success: false, message: "Failed get data");
+    } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return GeneralResponse( success: false, message: e.message);
+      return GeneralResponse(success: false, message: e.message);
     } catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return GeneralResponse( success: false, message:  e.toString());
+      return GeneralResponse(success: false, message: e.toString());
     }
   }
 
@@ -137,17 +145,21 @@ class ParkingRepository {
       );
       debugPrint("url ${Endpoint.urlParkingLocation}");
       debugPrint("response ${response.body}");
-      return response.statusCode == 200 ? parkingLocationResponseFromJson(response.body)
-          : response.statusCode == 403 ? ParkingLocationResponse( success: false, message: "Unauthorized", data:[])
-          : ParkingLocationResponse( success: false, message: "Failed get data", data: []);
-    } on HttpException catch(e, stackTrace){
+      return response.statusCode == 200
+          ? parkingLocationResponseFromJson(response.body)
+          : response.statusCode == 403
+              ? ParkingLocationResponse(
+                  success: false, message: "Unauthorized", data: [])
+              : ParkingLocationResponse(
+                  success: true, message: "Nothing Park Here!", data: []);
+    } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingLocationResponse( success: false, message: e.message, data: []);
+      return ParkingLocationResponse(
+          success: false, message: e.message, data: []);
     } catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
-      return ParkingLocationResponse( success: false, message:  e.toString(), data: []);
+      return ParkingLocationResponse(
+          success: false, message: e.toString(), data: []);
     }
   }
-
-
 }
