@@ -31,7 +31,7 @@ class ParkingRepository {
               ? ParkingCheckResponse(
                   success: false, message: "Unauthorized", data: [])
               : ParkingCheckResponse(
-                  success: false, message: "Failed get data", data: []);
+                  success: true, message: "Nothing Park Here!", data: []);
     } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
       return ParkingCheckResponse(success: false, message: e.message, data: []);
@@ -56,7 +56,7 @@ class ParkingRepository {
               ? ParkingCheckDetailResponse(
                   success: false, message: "Unauthorized")
               : ParkingCheckDetailResponse(
-                  success: false, message: "Failed get data");
+                  success: true, message: "Nothing Park Here!");
     } on HttpException catch (e, stackTrace) {
       debugPrintStack(label: e.toString(), stackTrace: stackTrace);
       return ParkingCheckDetailResponse(success: false, message: e.message);
