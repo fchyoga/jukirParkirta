@@ -190,24 +190,24 @@ class _HomePageJukirState extends State<HomePageJukir> {
         ?.animateCamera(CameraUpdate.newLatLngZoom(_myLocation!, 20));
   }
 
-  void _startLocationUpdates() {
-    _location.onLocationChanged.listen((loc.LocationData currentLocation) {
-      setState(() {
-        _myLocation = LatLng(
-          currentLocation.latitude!,
-          currentLocation.longitude!,
-        );
-        _myLocationMarker = <Marker>{
-          Marker(
-            markerId: MarkerId('my_location'),
-            position: _myLocation!,
-            icon: myLocationIcon,
-            infoWindow: InfoWindow(title: 'My Location'),
-          ),
-        };
-      });
-    });
-  }
+  // void _startLocationUpdates() {
+  //   _location.onLocationChanged.listen((loc.LocationData currentLocation) {
+  //     setState(() {
+  //       _myLocation = LatLng(
+  //         currentLocation.latitude!,
+  //         currentLocation.longitude!,
+  //       );
+  //       _myLocationMarker = <Marker>{
+  //         Marker(
+  //           markerId: MarkerId('my_location'),
+  //           position: _myLocation!,
+  //           icon: myLocationIcon,
+  //           infoWindow: InfoWindow(title: 'My Location'),
+  //         ),
+  //       };
+  //     });
+  //   });
+  // }
 
   void _onMapCreated(GoogleMapController controller) {
     _mapsController = controller;
@@ -227,20 +227,6 @@ class _HomePageJukirState extends State<HomePageJukir> {
       }
     });
   }
-
-  // Future<void> _fetchParkingLocations() async {
-  //   try {
-  //     List<dynamic> locations = await getLocations();
-  //     if (mounted) {
-  //       setState(() {
-  //         _parkingLocations = locations;
-  //       });
-  //     }
-  //   } catch (error) {
-  //     // Handle error fetching parking locations
-  //     print('Error fetching parking locations: $error');
-  //   }
-  // }
 
   Future<void> _showParkingArrivePopup(ParkingUser data) async {
     showDialog(
@@ -357,9 +343,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
     Map<String, dynamic>? data;
 
     try {
-      final userId = await getUserId();
-      final locationId = await getLocationParkingId(userId);
-      final dataList = await getParkingData(locationId);
+      final idUser = await getUserId();
+      final dataList = await getParkingData(idUser);
       if (dataList.isNotEmpty) {
         data = dataList.firstWhere((entry) => entry['id'] == parkingId,
             orElse: () => Map<String, dynamic>.from({}));
@@ -440,6 +425,26 @@ class _HomePageJukirState extends State<HomePageJukir> {
     }
   }
 
+  Future<int> getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('https://parkirta.com/api/profile/detail'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final id = data['data']['id_lokasi_parkir'];
+      return id;
+    } else {
+      throw Exception('Failed to fetch user ID');
+    }
+  }
+
   Future<int> getLocationParkingId(int userId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -455,9 +460,7 @@ class _HomePageJukirState extends State<HomePageJukir> {
       final data = jsonDecode(response.body);
       final locations = data['data'];
       final location = locations.firstWhere(
-        (loc) =>
-            loc['relasi_jukir'] != null &&
-            loc['relasi_jukir'][0]['id_jukir'] == userId,
+        (loc) => loc['id'] == userId,
         orElse: () => null,
       );
 
@@ -472,13 +475,13 @@ class _HomePageJukirState extends State<HomePageJukir> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getParkingData(int locationId) async {
+  Future<List<Map<String, dynamic>>> getParkingData(int idUser) async {
     final token = SpUtil.getString(API_TOKEN);
 
     final response = await http.post(
-      Uri.parse('https://parkirta.com/api/retribusi/parking/check'),
+      Uri.parse('https://parkirta.com/api/retribusi/parking/check/jukir'),
       body: jsonEncode({
-        'id_lokasi_parkir': locationId,
+        'id_jukir': idUser,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -493,34 +496,6 @@ class _HomePageJukirState extends State<HomePageJukir> {
       return List<Map<String, dynamic>>.from(parkings);
     } else {
       throw Exception('Failed to fetch parking data');
-    }
-  }
-
-  Future<void> _updateParkingStatus(String status) async {
-    final url = Uri.parse('https://parkirta.com/api/retribusi/parking/status');
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final userId = await getUserId();
-    final locationId = await getLocationParkingId(userId);
-
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-
-    final body = json.encode({
-      'id_lokasi_parkir': locationId,
-      'status': status,
-    });
-
-    final response = await http.post(url, headers: headers, body: body);
-
-    if (response.statusCode == 200) {
-      // Berhasil mengubah status
-      print('Status berhasil diperbarui');
-    } else {
-      // Gagal mengubah status
-      print('Gagal memperbarui status');
     }
   }
 
@@ -791,7 +766,6 @@ class _HomePageJukirState extends State<HomePageJukir> {
                                   context
                                       .read<HomeBloc>()
                                       .updateParkingStatus(newValue);
-                                  // _updateParkingStatus(newValue);
                                 });
                               },
                               items: _statusOptions.map((String status) {

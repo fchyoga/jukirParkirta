@@ -23,14 +23,15 @@ class HomeBloc extends Cubit<HomeState> {
 
     emit(LoadingState(true));
     int? userId = SpUtil.getInt(USER_ID, defValue: null);
+    int? onlineId = SpUtil.getInt(ONLINE_ID, defValue: null);
     int? locationId = SpUtil.getInt(LOCATION_ID, defValue: null);
     debugPrint("userid $userId locationId $locationId");
     if (locationId == null) {
       final responseLoc = await _parkingRepository.parkingLocation();
       emit(LoadingState(false));
       if (responseLoc.success) {
-        var location = responseLoc.data
-            .firstWhereOrNull((e) => e.relasiJukir.any((i) => i.id == userId));
+        var location =
+            responseLoc.data.firstWhereOrNull((e) => e.id == onlineId);
 
         debugPrint("location ${responseLoc.data.length} ${location?.toJson()}");
         if (location != null) {
@@ -112,6 +113,7 @@ class SuccessUpdateParkingState extends HomeState {
 class SessionExpiredState extends HomeState {
   const SessionExpiredState();
 }
+
 class ErrorState extends HomeState {
   final String error;
   const ErrorState({required this.error});

@@ -116,8 +116,10 @@ class _ProfileEditState extends State<ProfileEdit> {
       // Menambahkan data ke dalam fields
       request.fields['nama_lengkap'] = nameController.text;
       request.fields['email'] = emailController.text;
-      request.fields['password'] = passwordController.text;
-      request.fields['password_confirm'] = confirmController.text;
+      if (passwordController.text != "") {
+        request.fields['password'] = passwordController.text;
+        request.fields['password_confirm'] = confirmController.text;
+      }
       request.fields['role'] = 'jukir';
 
       // Menambahkan file gambar ke dalam request
