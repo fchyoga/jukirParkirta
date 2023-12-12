@@ -18,7 +18,6 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   HomePageJukir? homePageJukir;
@@ -39,26 +38,27 @@ class _MainPageState extends State<MainPage> {
     return BlocProvider(
         create: (context) => HomeBloc()..initial(),
         child: Scaffold(
-      key: NavigationService.navigatorKey,
-      backgroundColor: Gray100,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          HomePageJukir(),
-          ParkingPage(),
-        ],
-      ),
-      bottomNavigationBar:  Container(
-          color: Colors.white,
-          height: 70,
-          child: Column(
-              children: [
+          key: NavigationService.navigatorKey,
+          backgroundColor: Gray100,
+          body: IndexedStack(
+            index: _currentIndex,
+            children: [
+              HomePageJukir(),
+              ParkingPage(),
+            ],
+          ),
+          bottomNavigationBar: Container(
+              color: Colors.white,
+              height: 70,
+              child: Column(children: [
                 const Divider(
                   thickness: 1,
                   height: 1,
                   color: AppColors.cardGrey,
                 ),
-                const SizedBox(height: 8,),
+                const SizedBox(
+                  height: 8,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -71,9 +71,10 @@ class _MainPageState extends State<MainPage> {
                               _currentIndex = 0;
                             });
                           },
-                          icon:  SvgPicture.asset( _currentIndex == 0 ? "assets/images/ic_home.svg": "assets/images/ic_home_outline.svg"),
+                          icon: SvgPicture.asset(_currentIndex == 0
+                              ? "assets/images/ic_home.svg"
+                              : "assets/images/ic_home_outline.svg"),
                         ),
-
                       ],
                     ),
                     Column(
@@ -85,90 +86,92 @@ class _MainPageState extends State<MainPage> {
                               _currentIndex = 1;
                             });
                           },
-                          icon: SvgPicture.asset( _currentIndex == 1 ? "assets/images/ic_ticket.svg": "assets/images/ic_ticket_outline.svg"),
+                          icon: SvgPicture.asset(_currentIndex == 1
+                              ? "assets/images/ic_ticket.svg"
+                              : "assets/images/ic_ticket_outline.svg"),
                         ),
-
                       ],
                     ),
                   ],
-                )])
-      ),
-      floatingActionButton: _currentIndex == 0
-          ?Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-              bottom: 1,
-              child: Container(
-                width: 55,
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: AppColors.colorPrimary,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.colorPrimary.withOpacity(0.25),
-                      blurRadius: 8,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 5),
-                    ),
+                )
+              ])),
+          floatingActionButton: _currentIndex == 0
+              ? Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Positioned(
+                        bottom: 1,
+                        child: Container(
+                          width: 55,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: AppColors.colorPrimary,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.colorPrimary.withOpacity(0.25),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                        )),
+                    Container(
+                      width: 65,
+                      height: 65,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: AppColors.colorPrimary,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            "/",
+                          );
+                        },
+                        child:
+                            SvgPicture.asset("assets/images/ic_discovery.svg"),
+                      ),
+                    )
                   ],
-                ),)
-          ),
-          Container(
-            width: 65,
-            height: 65,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: AppColors.colorPrimary,
-
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  "/",
-                );
-              },
-              child: SvgPicture.asset("assets/images/ic_discovery.svg"),
-            ) ,
-          )
-        ],
-      ): null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    ));
+                )
+              : null,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+        ));
   }
-
 
   Future<void> _requestPermissions() async {
     if (Platform.isIOS) {
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
+              IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+            alert: true,
+            badge: true,
+            sound: true,
+          );
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          MacOSFlutterLocalNotificationsPlugin>()
+              MacOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+            alert: true,
+            badge: true,
+            sound: true,
+          );
     } else if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
 
-      final bool? granted = await androidImplementation?.requestPermission();
+      final bool? granted =
+          await androidImplementation?.requestNotificationsPermission();
       // setState(() {
       //   _notificationsEnabled = granted ?? false;
       // });
     }
   }
-
 }

@@ -43,6 +43,8 @@ class _HomePageJukirState extends State<HomePageJukir> {
   int? userId = SpUtil.getInt(USER_ID);
   String? userStatus = SpUtil.getString(USER_STATUS);
 
+  Map<String, dynamic> userData = {};
+
   final ImagePicker _imagePicker = ImagePicker();
   late File _vehicleImage;
   // late String _token;
@@ -72,7 +74,28 @@ class _HomePageJukirState extends State<HomePageJukir> {
   @override
   void initState() {
     _loadParkIcon();
+    fetchUserData();
     super.initState();
+  }
+
+  Future<void> fetchUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('https://parkirta.com/api/profile/detail'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        userData = jsonDecode(response.body)['data'];
+      });
+    } else {
+      print(response.body);
+      throw Exception('Failed to fetch user data');
+    }
   }
 
   @override
@@ -555,14 +578,16 @@ class _HomePageJukirState extends State<HomePageJukir> {
         debugPrint("activeParking ${activeParking.map((e) => e.toJson())}");
         if (activeParking.isNotEmpty) setParkingMarker(activeParking);
       } else if (state is SessionExpiredState) {
-        showTopSnackBar(_context, CustomSnackBar.error(
-          message: "Sesi anda telah habis. Silakan login kembali",
-        ));
+        showTopSnackBar(
+            Overlay.of(_context),
+            CustomSnackBar.error(
+              message: "Sesi anda telah habis. Silakan login kembali",
+            ));
         _context.read<AuthenticationBloc>().authenticationExpiredEvent();
         Navigator.pushNamedAndRemoveUntil(_context, "/", (route) => false);
       } else if (state is ErrorState) {
         showTopSnackBar(
-          context,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: state.error,
           ),
@@ -624,7 +649,14 @@ class _HomePageJukirState extends State<HomePageJukir> {
                 },
                 child: CircleAvatar(
                   radius: 20,
-                  child: Image.asset('assets/images/profile.png'),
+                  backgroundColor:
+                      Colors.transparent, // Sesuaikan sesuai kebutuhan
+                  backgroundImage: userData['foto_jukir'] != null
+                      ? NetworkImage(
+                          'https://parkirta.com/storage/uploads/foto/${userData['foto_jukir']}',
+                        ) as ImageProvider<
+                          Object> // Memberikan tipe ImageProvider<Object>
+                      : AssetImage('assets/images/profile.png'),
                 ),
               ),
             ),

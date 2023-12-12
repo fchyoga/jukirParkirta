@@ -30,15 +30,19 @@ class _AktivasiPageState extends State<AktivasiPage> {
           children: [
             SimpleDialogOption(
               onPressed: () async {
-                final picked = await picker.getImage(source: ImageSource.gallery);
-                Navigator.pop(context, picked != null ? File(picked.path) : null);
+                final picked =
+                    await picker.pickImage(source: ImageSource.gallery);
+                Navigator.pop(
+                    context, picked != null ? File(picked.path) : null);
               },
               child: const Text('Choose from Gallery'),
             ),
             SimpleDialogOption(
               onPressed: () async {
-                final picked = await picker.getImage(source: ImageSource.camera);
-                Navigator.pop(context, picked != null ? File(picked.path) : null);
+                final picked =
+                    await picker.pickImage(source: ImageSource.camera);
+                Navigator.pop(
+                    context, picked != null ? File(picked.path) : null);
               },
               child: const Text('Take a Photo'),
             ),
@@ -59,7 +63,8 @@ class _AktivasiPageState extends State<AktivasiPage> {
 
     if (_image != null) {
       // Membuat request HTTP
-      final url = Uri.parse('https://parkirta.com/api/dompet/kartu_parkir/aktivasi');
+      final url =
+          Uri.parse('https://parkirta.com/api/dompet/kartu_parkir/aktivasi');
       final request = http.MultipartRequest('POST', url);
 
       // Menambahkan header bearer token
@@ -90,12 +95,13 @@ class _AktivasiPageState extends State<AktivasiPage> {
                 actions: [
                   TextButton(
                     onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SubmittedPage()),
-                    );
-                  },
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SubmittedPage()),
+                      );
+                    },
                     child: Text('OK'),
                   ),
                 ],
@@ -144,7 +150,6 @@ class _AktivasiPageState extends State<AktivasiPage> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -227,21 +232,21 @@ class _AktivasiPageState extends State<AktivasiPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
-                          height:100,
+                          height: 100,
                           decoration: BoxDecoration(
                             color: Gray200,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: _image != null
-                            ? Image.file(_image!, fit: BoxFit.cover)
-                            : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.camera_alt),
-                                SizedBox(height: 8),
-                                Text('Tambahkan foto'),
-                              ],
-                            ),
+                              ? Image.file(_image!, fit: BoxFit.cover)
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.camera_alt),
+                                    SizedBox(height: 8),
+                                    Text('Tambahkan foto'),
+                                  ],
+                                ),
                         ),
                       ],
                     ),
@@ -257,13 +262,12 @@ class _AktivasiPageState extends State<AktivasiPage> {
                       ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5), 
+                          borderRadius: BorderRadius.circular(5),
                         ),
                       ),
                     ),
                     child: const Text('Submit'),
                   ),
-  
                 ],
               ),
             ),

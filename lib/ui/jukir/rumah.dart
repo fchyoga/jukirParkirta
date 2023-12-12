@@ -23,7 +23,6 @@ class RumahPageJukir extends StatefulWidget {
 }
 
 class _RumahPageJukirState extends State<RumahPageJukir> {
-
   bool _isLoading = true;
   final _loadingDialog = LoadingDialog();
 
@@ -41,7 +40,7 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
 
   @override
   void setState(fn) {
-    if(mounted) {
+    if (mounted) {
       super.setState(fn);
     }
   }
@@ -61,87 +60,85 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<HomeBloc, HomeState>(
-            listener: (context, state) async{
-              if (state is LoadingState) {
-                state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
-              } else if (state is SuccessGetParkingLocationState) {
-                setState(() {
-                  _parkingLocations = state.data;
-                });
-              } else if (state is ErrorState) {
-                showTopSnackBar(
-                  context,
-                  CustomSnackBar.error(
-                    message: state.error,
-                  ),
-                );
-              }
-            },
-            child: BlocBuilder<HomeBloc, HomeState>(
-                builder: (context, state) {
-                  // _context = context;
-                  return Scaffold(
-                    backgroundColor: Gray100,
-                    appBar: AppBar(
-                      backgroundColor: Red500,
-                      toolbarHeight: 84,
-                      titleSpacing: 0,
-                      elevation: 0,
-                      automaticallyImplyLeading: false,
-                      title: Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 24),
-                            child: Image.asset(
-                              'assets/images/logo-parkirta2.png',
-                              height: 40,
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                        ],
-                      ),
-                      actions: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 24),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ProfilePage()),
-                              );
-                            },
-                            child: CircleAvatar(
-                              backgroundImage: AssetImage('assets/images/profile.png'),
-                              radius: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    body: Stack(
-                      children: [
-                        GoogleMap(
-                          onMapCreated: _onMapCreated,
-                          initialCameraPosition: const CameraPosition(
-                            target: LatLng(-5.143648100120257, 119.48282708990482), // Ganti dengan posisi awal peta
-                            zoom: 20.0,
-                          ),
-                          markers: Set<Marker>.from(_parkingLocations!.map((location) => Marker(
-                            markerId: MarkerId(location.id.toString()),
-                            position: LatLng(
-                              double.parse(location.lat),
-                              double.parse(location.long),
-                            ),
-                            icon: defaultIcon,
-                          ))).union(_myLocationMarker),
-                          polylines: _polylines ?? {},
-                        ),
-                      ],
-                    ),
-                  );
-                })
+    return BlocListener<HomeBloc, HomeState>(listener: (context, state) async {
+      if (state is LoadingState) {
+        state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
+      } else if (state is SuccessGetParkingLocationState) {
+        setState(() {
+          _parkingLocations = state.data;
+        });
+      } else if (state is ErrorState) {
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: state.error,
+          ),
         );
+      }
+    }, child: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+      // _context = context;
+      return Scaffold(
+        backgroundColor: Gray100,
+        appBar: AppBar(
+          backgroundColor: Red500,
+          toolbarHeight: 84,
+          titleSpacing: 0,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 24),
+                child: Image.asset(
+                  'assets/images/logo-parkirta2.png',
+                  height: 40,
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 24),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                  );
+                },
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/profile.png'),
+                  radius: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(-5.143648100120257,
+                    119.48282708990482), // Ganti dengan posisi awal peta
+                zoom: 20.0,
+              ),
+              markers:
+                  Set<Marker>.from(_parkingLocations!.map((location) => Marker(
+                        markerId: MarkerId(location.id.toString()),
+                        position: LatLng(
+                          double.parse(location.lat),
+                          double.parse(location.long),
+                        ),
+                        icon: defaultIcon,
+                      ))).union(_myLocationMarker),
+              polylines: _polylines ?? {},
+            ),
+          ],
+        ),
+      );
+    }));
   }
 
   Future<Uint8List> _getBytesFromAsset(String path) async {
@@ -261,7 +258,4 @@ class _RumahPageJukirState extends State<RumahPageJukir> {
       });
     });
   }
-
-
-
 }

@@ -9,24 +9,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.18.0
+  intl: ^0.19.0
   google_maps_flutter: ^2.2.0
-  http: ^0.13.3
+  http: ^1.1.2
   shared_preferences: ^2.0.8
   sp_util: ^2.0.0
   cupertino_icons: ^1.0.0
-  geolocator: ^8.0.1
-  permission_handler: any
+  geolocator: ^10.1.0
+  permission_handler: ^11.1.0
   flutter_svg: any
   bitmap: any
-  flutter_polyline_points: ^1.0.0
+  flutter_polyline_points: ^2.0.0
   location: any
-  image_picker: ^0.8.8
+  image_picker: ^1.0.4
   bloc: ^8.0.3
   flutter_bloc: ^8.0.1
-  shimmer: ^2.0.0
-  top_snackbar_flutter: ^1.0.0
-  flutter_local_notifications: ^9.9.1
+  shimmer: ^3.0.0
+  top_snackbar_flutter: ^3.1.0
+  flutter_local_notifications: ^16.2.0
   firebase_messaging: ^14.1.0
   nfc_manager: ^3.3.0
   iconly: ^1.0.1
@@ -38,7 +38,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true

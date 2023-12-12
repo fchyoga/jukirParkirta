@@ -54,19 +54,20 @@ class _ProfilePageState extends State<ProfilePage> {
     final token = prefs.getString('token');
 
     final response = await http.get(
-      Uri.parse('https://parkirta.com/api/master/lokasi_parkir'),
+      Uri.parse('https://parkirta.com/api/master/lokasi_parkir_jukir'),
       headers: {
         'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
       final decodedData = jsonDecode(response.body);
-      if (decodedData['data'] is List) {
+      if (decodedData['data'] is Map && decodedData['data']['data'] is List) {
         setState(() {
-          locationData =
-              (decodedData['data'] as List).cast<Map<String, dynamic>>();
+          locationData = (decodedData['data']['data'] as List)
+              .cast<Map<String, dynamic>>();
           locations = locationData
-              .map<String>((location) => location['nama_lokasi'])
+              .map<String>(
+                  (location) => location['lokasi_parkir']['nama_lokasi'])
               .toList();
           selectedLocation = locations.isNotEmpty ? locations.first : '';
         });
@@ -80,34 +81,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // Future<void> _updateUserStatus() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token');
-
-  //   final response = await http.post(
-  //     Uri.parse('https://parkirta.com/api/profile/kondisi/update'),
-  //     headers: {
-  //       'Authorization': 'Bearer $token',
-  //     },
-  //     body: {
-  //       'kondisi': isOnline ? 'Online' : 'Offline',
-  //       'id_lokasi_parkir': selectedLocation,
-  //     },
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final responseData = jsonDecode(response.body)['data'];
-  //     print('User status updated: $responseData');
-  //     // You can update the UI or handle the response accordingly
-  //   } else {
-  //     print(response.body);
-  //     throw Exception('Failed to update user status');
-  //   }
-  // }
-
   Future<void> _updateUserStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+
+    final selectedLocationData = locationData.firstWhere(
+      (location) =>
+          location['lokasi_parkir']['nama_lokasi'] == selectedLocation,
+    );
 
     final response = await http.post(
       Uri.parse('https://parkirta.com/api/profile/kondisi/update'),
@@ -116,10 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       body: {
         'kondisi': isOnline ? 'Online' : 'Offline',
-        'id_lokasi_parkir': locationData
-            .firstWhere(
-                (location) => location['nama_lokasi'] == selectedLocation)['id']
-            .toString(),
+        'id_lokasi_parkir': selectedLocationData['id_lokasi_parkir'].toString(),
       },
     );
 
@@ -273,7 +251,11 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/images/profile.png'),
+                backgroundImage: userData['foto_jukir'] != null
+                    ? NetworkImage(
+                            'https://parkirta.com/storage/uploads/foto/${userData['foto_jukir']}')
+                        as ImageProvider<Object>
+                    : const AssetImage('assets/images/profile.png'),
               ),
               SizedBox(height: 16),
               Text(

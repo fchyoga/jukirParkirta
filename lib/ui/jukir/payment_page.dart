@@ -13,9 +13,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../data/model/retribusi.dart';
 
-
 class PaymentPage extends StatefulWidget {
-
   PaymentPage();
 
   @override
@@ -23,7 +21,6 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-
   final _loadingDialog = LoadingDialog();
   Retribusi? retribution;
   Duration? duration;
@@ -40,190 +37,213 @@ class _PaymentPageState extends State<PaymentPage> {
     // paymentStep = args[PAYMENT_STEP];
     return BlocProvider(
         create: (context) => PaymentBloc(),
-        child: BlocListener<PaymentBloc, PaymentState>(
-            listener: (context, state) async{
-              if (state is LoadingState) {
-                state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
-              // } else if (state is CheckDetailParkingSuccessState) {
-              } else if (state is PaymentSuccessState) {
-                showTopSnackBar(
-                  context,
-                  const CustomSnackBar.success(
-                    message: "Pembayaran Berhasil",
+        child: BlocListener<PaymentBloc, PaymentState>(listener:
+            (context, state) async {
+          if (state is LoadingState) {
+            state.show ? _loadingDialog.show(context) : _loadingDialog.hide();
+            // } else if (state is CheckDetailParkingSuccessState) {
+          } else if (state is PaymentSuccessState) {
+            showTopSnackBar(
+              Overlay.of(context),
+              const CustomSnackBar.success(
+                message: "Pembayaran Berhasil",
+              ),
+            );
+            Navigator.pop(context);
+          } else if (state is ErrorState) {
+            showTopSnackBar(
+              Overlay.of(context),
+              CustomSnackBar.error(
+                message: state.error,
+              ),
+            );
+          }
+        }, child:
+            BlocBuilder<PaymentBloc, PaymentState>(builder: (context, state) {
+          return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                automaticallyImplyLeading: false,
+                centerTitle: true,
+                leading: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.arrow_back_ios_rounded,
+                      color: AppColors.text,
+                      size: 18,
+                    ),
                   ),
-                );
-                Navigator.pop(context);
-              } else if (state is ErrorState) {
-                showTopSnackBar(
-                  context,
-                  CustomSnackBar.error(
-                    message: state.error,
-                  ),
-                );
-              }
-            },
-            child: BlocBuilder<PaymentBloc, PaymentState>(
-                builder: (context, state) {
-                  return Scaffold(
-                      backgroundColor: Colors.white,
-                      appBar: AppBar(
-                        elevation: 0,
-                        backgroundColor: Colors.white,
-                        automaticallyImplyLeading: false,
-                        centerTitle: true,
-                        leading: InkWell(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(
-                              Icons.arrow_back_ios_rounded,
-                              color: AppColors.text,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                        title: const Text(
-                          "Pembayaran",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16
-                          ),
-                        ),
-                      ),
-                      body:   SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            retribution!=null ? buildParkingConfirmation(context):
-                            const Text("Payment not found"),
-                          ],
-                        ),
-                      )
-                  );
-                }
-            )
-        )
-    );
+                ),
+                title: const Text(
+                  "Pembayaran",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+              ),
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    retribution != null
+                        ? buildParkingConfirmation(context)
+                        : const Text("Payment not found"),
+                  ],
+                ),
+              ));
+        })));
   }
 
-  Widget buildParkingConfirmation(BuildContext context){
+  Widget buildParkingConfirmation(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-       children: [
-         Container(
-           padding: EdgeInsets.all(20),
-           decoration: BoxDecoration(
-             color: AppColors.cardGrey,
-             borderRadius: BorderRadius.circular(10)
-           ),
-           child: Column(
-             children: [
-               Row(
-               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-               children: [
-                 const Text("Waktu Parkir : ", style: TextStyle(fontWeight: FontWeight.normal)),
-                 Text("${retribution?.lamaParkir ?? 0} jam", style: const TextStyle(fontWeight: FontWeight.normal)),
-               ],
-             ),
-               const SizedBox(height: 5),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 children: [
-                   Text("Tarif Per-Jam : ", style: TextStyle(fontWeight: FontWeight.normal)),
-                   Text("Rp ${retribution!.pembayaran?.grossAmount ?? 0}", style: TextStyle(fontWeight: FontWeight.normal)),
-                 ],
-               ),
-               const SizedBox(height: 5),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 children: [
-                   const Text("Total : ", style: TextStyle(fontWeight: FontWeight.bold)),
-                   Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                 ],
-               ),
-             ],
-           ),
-         ),
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                color: AppColors.cardGrey,
+                borderRadius: BorderRadius.circular(10)),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Waktu Parkir : ",
+                        style: TextStyle(fontWeight: FontWeight.normal)),
+                    Text("${retribution?.lamaParkir ?? 0} jam",
+                        style: const TextStyle(fontWeight: FontWeight.normal)),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Tarif Per-Jam : ",
+                        style: TextStyle(fontWeight: FontWeight.normal)),
+                    Text("Rp ${retribution!.pembayaran?.grossAmount ?? 0}",
+                        style: TextStyle(fontWeight: FontWeight.normal)),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Total : ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}",
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 80,
+          ),
+          const Text("Metode pembayaran",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(
+            height: 10,
+          ),
+          retribution?.idMetodePembayaran != 1
+              ? ButtonDefault(
+                  title: "Card Pay",
+                  color: AppColors.green,
+                  onTap: () async {
+                    bool isAvailable = await NfcManager.instance.isAvailable();
+                    if (!isAvailable) {
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        const CustomSnackBar.error(
+                          message: "NFC tidak tersedia",
+                        ),
+                      );
+                      return;
+                    }
 
-         const SizedBox(height: 80,),
-         const Text("Metode pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
-         const SizedBox(height: 10,),
-         retribution?.idMetodePembayaran!= 1 ? ButtonDefault(title: "Card Pay", color: AppColors.green, onTap: () async {
-           bool isAvailable = await NfcManager.instance.isAvailable();
-           if(!isAvailable){
-             showTopSnackBar(
-               context,
-               const CustomSnackBar.error(
-                 message: "NFC tidak tersedia",
-               ),
-             );
-             return;
-           }
+                    // Start Session
+                    NfcManager.instance.startSession(
+                      onDiscovered: (NfcTag tag) async {
+                        if (ctxSheetBottom == null) return;
 
-           // Start Session
-           NfcManager.instance.startSession(
-             onDiscovered: (NfcTag tag) async {
-               if(ctxSheetBottom==null) return;
+                        String? cardNumber;
+                        Ndef? ndef = Ndef.from(tag);
 
-               String? cardNumber;
-               Ndef? ndef = Ndef.from(tag);
+                        if (ndef == null) {
+                          showTopSnackBar(
+                            Overlay.of(context),
+                            const CustomSnackBar.error(
+                              message: "Kartu tidak compatible",
+                            ),
+                          );
+                          return;
+                        }
+                        var read = ndef.cachedMessage;
+                        read?.records.forEach((e) {
+                          var data = Record.fromNdef(e);
+                          if (data is WellknownTextRecord) {
+                            cardNumber = data.text;
+                          }
+                        });
 
-               if (ndef == null) {
-                 showTopSnackBar(
-                   context,
-                   const CustomSnackBar.error(
-                     message: "Kartu tidak compatible",
-                   ),
-                 );
-                 return;
-               }
-               var read =  ndef.cachedMessage;
-               read?.records.forEach((e) {
-                 var data = Record.fromNdef(e);
-                 if(data is WellknownTextRecord){
-                   cardNumber = data.text;
-                 }
-               });
+                        if (cardNumber == null) {
+                          showTopSnackBar(
+                            Overlay.of(context),
+                            const CustomSnackBar.error(
+                              message: "Kartu tidak dapat dikenali",
+                            ),
+                          );
+                          return;
+                        }
 
-               if(cardNumber == null){
-                 showTopSnackBar(
-                   context,
-                   const CustomSnackBar.error(
-                     message: "Kartu tidak dapat dikenali",
-                   ),
-                 );
-                 return;
-               }
+                        Timer(const Duration(milliseconds: 500), () {
+                          Navigator.pop(ctxSheetBottom!);
 
-               Timer(const Duration(milliseconds: 500),(){
-                 Navigator.pop(ctxSheetBottom!);
+                          context.read<PaymentBloc>().paymentJukir(
+                              retribution?.pembayaran?.noInvoice ?? "",
+                              USE_CARD_CODE,
+                              cardNumber!);
+                        });
+                      },
+                    );
 
-                 context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", USE_CARD_CODE, cardNumber!);
-               });
-             },
-           );
-
-          await showBottomSheetWaiting(context);
-         }): SizedBox(height: 0,),
-         const SizedBox(height: 10,),
-         retribution?.idMetodePembayaran!= 0 ? ButtonDefault(title: "Cash", color: AppColors.green, onTap: (){
-           context.read<PaymentBloc>().paymentJukir(retribution?.pembayaran?.noInvoice ?? "", CASH_CODE, "");
-         }): SizedBox(height: 0,),
-
-       ],
+                    await showBottomSheetWaiting(context);
+                  })
+              : SizedBox(
+                  height: 0,
+                ),
+          const SizedBox(
+            height: 10,
+          ),
+          retribution?.idMetodePembayaran != 0
+              ? ButtonDefault(
+                  title: "Cash",
+                  color: AppColors.green,
+                  onTap: () {
+                    context.read<PaymentBloc>().paymentJukir(
+                        retribution?.pembayaran?.noInvoice ?? "",
+                        CASH_CODE,
+                        "");
+                  })
+              : SizedBox(
+                  height: 0,
+                ),
+        ],
       ),
     );
   }
 
-
-  Future<void> showBottomSheetWaiting(BuildContext _context) async{
-
-    var sb =  showModalBottomSheet(
+  Future<void> showBottomSheetWaiting(BuildContext _context) async {
+    var sb = showModalBottomSheet(
         context: _context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
@@ -235,9 +255,7 @@ class _PaymentPageState extends State<PaymentPage> {
               duration: const Duration(milliseconds: 100),
               curve: Curves.decelerate,
               child: Container(
-                constraints: const BoxConstraints(
-                    minHeight: 200
-                ),
+                constraints: const BoxConstraints(minHeight: 200),
                 alignment: Alignment.center,
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -252,7 +270,9 @@ class _PaymentPageState extends State<PaymentPage> {
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Text(
                       "Tunggu sebentar..",
                       style: TextStyle(
@@ -272,23 +292,24 @@ class _PaymentPageState extends State<PaymentPage> {
       debugPrint("stop season");
       NfcManager.instance.stopSession();
     });
-
   }
 
-  String? getDurationString(){
-    if(duration!=null){
-      var minutes = duration!.inMinutes.remainder(60) == 0 ? "01" :duration!.inMinutes.remainder(60).toString().padLeft(2, '0');
+  String? getDurationString() {
+    if (duration != null) {
+      var minutes = duration!.inMinutes.remainder(60) == 0
+          ? "01"
+          : duration!.inMinutes.remainder(60).toString().padLeft(2, '0');
       return "${duration!.inHours.toString().padLeft(2, '0')}:$minutes";
-    }else{
+    } else {
       return null;
     }
   }
 
-  String? getTotalPrice(){
-    if(retribution?.biayaParkir?.biayaParkir !=null){
+  String? getTotalPrice() {
+    if (retribution?.biayaParkir?.biayaParkir != null) {
       int hour = int.tryParse(retribution?.lamaParkir ?? "1") ?? 1;
-      return "${hour*retribution!.biayaParkir!.biayaParkir}";
-    }else{
+      return "${hour * retribution!.biayaParkir!.biayaParkir}";
+    } else {
       return null;
     }
   }
