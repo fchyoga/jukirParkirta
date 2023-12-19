@@ -129,7 +129,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   children: [
                     Text("Tarif Per-Jam : ",
                         style: TextStyle(fontWeight: FontWeight.normal)),
-                    Text("Rp ${retribution!.pembayaran?.grossAmount ?? 0}",
+                    Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}",
                         style: TextStyle(fontWeight: FontWeight.normal)),
                   ],
                 ),
@@ -139,7 +139,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   children: [
                     const Text("Total : ",
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("Rp ${retribution!.biayaParkir?.biayaParkir ?? 0}",
+                    Text("Rp ${retribution!.pembayaran?.grossAmount ?? 0}",
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
