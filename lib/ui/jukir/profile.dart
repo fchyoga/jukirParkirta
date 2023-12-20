@@ -111,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> saveKondisiToAPI(String kondisi, String idLokasi) async {
+  Future<void> saveKondisiToAPI(String kondisi) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -122,7 +122,6 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       body: {
         'kondisi': kondisi,
-        'id_lokasi_parkir': idLokasi,
       },
     );
 
@@ -131,7 +130,6 @@ class _ProfilePageState extends State<ProfilePage> {
       print('User status updated: $responseData');
       setState(() {
         userData['kondisi'] = kondisi;
-        selectedLocation = idLokasi;
       });
     } else {
       print(response.body);
@@ -234,10 +232,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 setState(() {
                   isOnline = value;
                   if (isOnline) {
-                    _showLocationPicker();
+                    saveKondisiToAPI('Online');
                   } else {
                     // Jika switch diubah menjadi Offline, simpan kondisi ke API
-                    saveKondisiToAPI('Offline', selectedLocation);
+                    saveKondisiToAPI('Offline');
                   }
                 });
               },
