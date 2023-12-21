@@ -110,7 +110,7 @@ class ParkingRepository {
 
   Future<GeneralResponse> updateParkingStatus(String status) async {
     try {
-      int? locationId = SpUtil.getInt(LOCATION_ID);
+      int? locationId = SpUtil.getInt(ONLINE_ID);
       Map<String, dynamic> data = {
         'id_lokasi_parkir': locationId.toString(),
         'status': status

@@ -24,7 +24,7 @@ class HomeBloc extends Cubit<HomeState> {
     emit(LoadingState(true));
     int? userId = SpUtil.getInt(USER_ID, defValue: null);
     int? onlineId = SpUtil.getInt(ONLINE_ID, defValue: null);
-    int? locationId = SpUtil.getInt(LOCATION_ID, defValue: null);
+    int? locationId = SpUtil.getInt(ONLINE_ID, defValue: null);
     debugPrint("userid $userId locationId $locationId");
     if (locationId == null) {
       final responseLoc = await _parkingRepository.parkingLocation();
